@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Red_Hat_Display } from "next/font/google";
 
+const redHatDisplay = Red_Hat_Display({
+  subsets: ["latin"],
+  weight: ["400", "700"], // Choose desired weights
+  variable: "--font-redhat", // Define CSS variable
+});
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -23,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={redHatDisplay.variable}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
