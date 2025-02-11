@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { HomeIcon, Plus, Settings } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 interface WordItem {
   word: string;
   definition: string;
@@ -23,6 +23,32 @@ export default function Home() {
   }>({});
   const [newWord, setNewWord] = useState("");
   const [newDefinition, setNewDefinition] = useState("");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = cardRefs.current.findIndex(
+              (ref) => ref === entry.target
+            );
+            if (index !== -1) {
+              setCurrentIndex(index);
+            }
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    cardRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => observer.disconnect();
+  }, [words]);
 
   useEffect(() => {
     const storedWords = localStorage.getItem("words");
@@ -52,10 +78,17 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-black text-white">
-      {/* Main Content */}
+    <div className="flex flex-col min-h-screen bg-[#121212] text-white">
+      <div className="fixed top-0 left-0 right-0 border-b border-white/10 bg-[#121212]/80 backdrop-blur-sm">
+        <div className="flex justify-between items-center p-4 mx-auto ">
+          <p className="font-redhat text-2xl font-bold pl-2">Flashcards</p>
+          <Button variant="ghost" size="icon" className="h-12 w-12">
+            <Settings className="h-6 w-6" />
+          </Button>
+        </div>
+      </div>
+
       <main className="flex-1 relative">
-        {/* Scrollable Container */}
         <div
           className="absolute inset-0 overflow-y-auto snap-y snap-mandatory"
           style={{
@@ -63,7 +96,6 @@ export default function Home() {
             msOverflowStyle: "none",
           }}
         >
-          {/* Hide scrollbar for Chrome/Safari/Opera */}
           <style jsx global>{`
             .snap-mandatory::-webkit-scrollbar {
               display: none;
@@ -73,6 +105,9 @@ export default function Home() {
           {words.map((item, index) => (
             <div
               key={index}
+              ref={(el) => {
+                cardRefs.current[index] = el;
+              }}
               className="h-screen flex items-center justify-center snap-start px-4 cursor-pointer"
               onClick={() => toggleDefinition(index)}
             >
@@ -92,11 +127,10 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 border-t border-white/10 bg-black/80 backdrop-blur-sm">
+      <div className="fixed bottom-0 left-0 right-0 border-t border-white/10 bg-[#121212]/80 backdrop-blur-sm">
         <div className="flex justify-between items-center p-4 mx-auto ">
           <Button variant="ghost" size="icon" className="h-12 w-12">
-            <HomeIcon className="h-6 w-6" />
+            <p>{currentIndex + 1 + " / " + words.length}</p>
           </Button>
 
           <Drawer>
@@ -146,7 +180,7 @@ export default function Home() {
           </Drawer>
 
           <Button variant="ghost" size="icon" className="h-12 w-12">
-            <Settings className="h-6 w-6" />
+            <HomeIcon className="h-6 w-6" />
           </Button>
         </div>
       </div>
