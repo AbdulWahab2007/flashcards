@@ -76,21 +76,13 @@ export default function Home() {
       setNewDefinition("");
     }
   };
+  console.log(currentIndex);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#121212] text-white">
-      <div className="fixed top-0 left-0 right-0 border-b border-white/10 bg-[#121212]/80 backdrop-blur-sm">
-        <div className="flex justify-between items-center p-4 mx-auto ">
-          <p className="font-redhat text-2xl font-bold pl-2">Flashcards</p>
-          <Button variant="ghost" size="icon" className="h-12 w-12">
-            <Settings className="h-6 w-6" />
-          </Button>
-        </div>
-      </div>
-
       <main className="flex-1 relative">
         <div
-          className="absolute inset-0 overflow-y-auto snap-y snap-mandatory"
+          className="fixed inset-0 overflow-y-auto snap-y snap-mandatory"
           style={{
             scrollbarWidth: "none",
             msOverflowStyle: "none",
@@ -101,36 +93,54 @@ export default function Home() {
               display: none;
             }
           `}</style>
-
-          {words.map((item, index) => (
-            <div
-              key={index}
-              ref={(el) => {
-                cardRefs.current[index] = el;
-              }}
-              className="h-screen flex items-center justify-center snap-start px-4 cursor-pointer"
-              onClick={() => toggleDefinition(index)}
-            >
-              <div className="max-w-md w-full space-y-4 text-center">
-                {visibleDefinitions[index] ? (
-                  <p className="text-4xl text-gray-400 font-redhat">
-                    {item.definition}
-                  </p>
-                ) : (
-                  <h1 className="text-4xl font-bold font-redhat">
-                    {item.word}
-                  </h1>
-                )}
-              </div>
+          {words.length == 0 ? (
+            <div className="h-full w-full flex justify-center items-center">
+              <p className="text-3xl text-gray-400 font-openSans">
+                No words to show
+              </p>
             </div>
-          ))}
+          ) : (
+            words.map((item, index) => (
+              <div
+                key={index}
+                ref={(el) => {
+                  cardRefs.current[index] = el;
+                }}
+                className="h-screen flex items-center justify-center snap-start px-4 cursor-pointer"
+                onClick={() => toggleDefinition(index)}
+              >
+                <div className="max-w-md border-2 rounded-3xl border-gray-400 p-1  h-[65%] flex items-center justify-center w-full space-y-4 text-center">
+                  {visibleDefinitions[index] ? (
+                    <p className="text-xl text-gray-300 font-opensans">
+                      {item.definition}
+                    </p>
+                  ) : (
+                    <h1 className="text-4xl font-bold font-poppins">
+                      {item.word}
+                    </h1>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </main>
-
+      <div className="fixed top-0 left-0 right-0 border-b border-white/10 bg-[#121212]/80 backdrop-blur-sm">
+        <div className="flex justify-between items-center p-4 mx-auto ">
+          <p className="font-poppins font-semibold text-2xl pl-2">Flashcards</p>
+          <Button variant="ghost" size="icon" className="h-12 w-12">
+            <Settings className="h-6 w-6" />
+          </Button>
+        </div>
+      </div>
       <div className="fixed bottom-0 left-0 right-0 border-t border-white/10 bg-[#121212]/80 backdrop-blur-sm">
         <div className="flex justify-between items-center p-4 mx-auto ">
           <Button variant="ghost" size="icon" className="h-12 w-12">
-            <p>{currentIndex + 1 + " / " + words.length}</p>
+            <p>
+              {words.length == 0
+                ? currentIndex + " / " + words.length
+                : currentIndex + 1 + " / " + words.length}
+            </p>
           </Button>
 
           <Drawer>
@@ -150,26 +160,26 @@ export default function Home() {
                     placeholder="Enter word"
                     value={newWord}
                     onChange={(e) => setNewWord(e.target.value)}
-                    className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-400 font-redhat"
+                    className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-400 font-opensans"
                   />
                   <Input
                     placeholder="Enter definition"
                     value={newDefinition}
                     onChange={(e) => setNewDefinition(e.target.value)}
-                    className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-400 font-redhat"
+                    className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-400 font-opensans"
                   />
                 </div>
                 <div className="pt-6 pb-4 space-y-4">
                   <Button
                     onClick={addWord}
-                    className="w-full bg-white text-black hover:bg-white/90 font-redhat"
+                    className="w-full bg-white text-black hover:bg-white/90 font-poppins"
                   >
                     Add Word
                   </Button>
                   <DrawerClose asChild>
                     <Button
                       variant="ghost"
-                      className="w-full border border-white/10 font-redhat"
+                      className="w-full border border-white/10 font-poppins"
                     >
                       Cancel
                     </Button>

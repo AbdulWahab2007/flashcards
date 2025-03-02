@@ -11,6 +11,8 @@ export default {
     extend: {
       fontFamily: {
         redhat: ["var(--font-redhat)"],
+        openSans: ["var(--font-opensans)"],
+        poppins: ["var(--font-poppins)"],
       },
       colors: {
         background: "hsl(var(--background))",
