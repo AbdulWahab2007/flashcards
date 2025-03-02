@@ -1,7 +1,7 @@
 {
-  "name": "My Next.js PWA",
-  "short_name": "NextPWA",
-  "description": "A Progressive Web App built with Next.js",
+  "name": "FlashCards",
+  "short_name": "FlashCards",
+  "description": "A flash cards app for your ease.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
