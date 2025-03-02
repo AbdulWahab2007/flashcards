@@ -6,7 +6,7 @@ import { Open_Sans } from "next/font/google";
 import { Poppins } from "next/font/google";
 
 export const metadata: Metadata = {
-  title: "FlashCards",
+  title: "Flash",
   description: "A flashcard app for you ease.",
   viewport: "width=device-width, initial-scale=1",
   themeColor: "#000000",

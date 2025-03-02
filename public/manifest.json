@@ -1,11 +1,11 @@
 {
-  "name": "FlashCards",
-  "short_name": "FlashCards",
+  "name": "Flash",
+  "short_name": "Flash",
   "description": "A flash cards app for your ease.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "background_color": "##121212",
+  "theme_color": "#ffffff",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
