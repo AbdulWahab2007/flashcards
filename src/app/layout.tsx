@@ -4,6 +4,7 @@ import "./globals.css";
 import { Red_Hat_Display } from "next/font/google";
 import { Open_Sans } from "next/font/google";
 import { Poppins } from "next/font/google";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Flash",
@@ -52,6 +53,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <Toaster position="bottom-center" richColors />
       </body>
     </html>
   );

@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
   Drawer,
   DrawerClose,
@@ -8,7 +9,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { HomeIcon, Plus, Settings } from "lucide-react";
+import { Plus, Settings, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 interface WordItem {
   word: string;
@@ -73,7 +74,14 @@ export default function Home() {
       localStorage.setItem("words", JSON.stringify(updatedWords));
       setNewWord("");
       setNewDefinition("");
+      toast.success("Another word enters the Hall of Knowledge! 🏛️");
     }
+  };
+  const deleteWord = (index: number) => {
+    const updatedWords = words.filter((_, i) => i !== index);
+    setWords(updatedWords);
+    localStorage.setItem("words", JSON.stringify(updatedWords));
+    toast.error("Poof! That word just vanished into the void. 🚀");
   };
   console.log(currentIndex);
 
@@ -125,7 +133,7 @@ export default function Home() {
         </div>
       </main>
       <div className="fixed top-0 left-0 right-0 border-b border-white/10 bg-[#121212]/80 backdrop-blur-sm">
-        <div className="flex justify-between items-center p-4 mx-auto ">
+        <div className="flex justify-between items-center p-2 mx-auto ">
           <p className="font-poppins font-semibold text-2xl pl-2">Flashcards</p>
           <Button variant="ghost" size="icon" className="h-12 w-12">
             <Settings className="h-6 w-6" />
@@ -133,20 +141,20 @@ export default function Home() {
         </div>
       </div>
       <div className="fixed bottom-0 left-0 right-0 border-t border-white/10 bg-[#121212]/80 backdrop-blur-sm">
-        <div className="flex justify-between items-center p-4 mx-auto ">
-          <Button variant="ghost" size="icon" className="h-12 w-12">
-            <p>
+        <div className="flex justify-between items-center p-2 mx-auto ">
+          <div className="flex items-center justify-center h-12 w-12 select-none">
+            <p className="font-openSans text-sm">
               {words.length == 0
                 ? currentIndex + " / " + words.length
                 : currentIndex + 1 + " / " + words.length}
             </p>
-          </Button>
+          </div>
 
           <Drawer>
             <DrawerTrigger asChild>
               <Button
                 size="icon"
-                className="h-14 w-14 rounded-full border-2 border-white/10"
+                className="h-12 w-12 rounded-full border-2 border-white/10"
               >
                 <Plus className="h-6 w-6" />
               </Button>
@@ -188,8 +196,13 @@ export default function Home() {
             </DrawerContent>
           </Drawer>
 
-          <Button variant="ghost" size="icon" className="h-12 w-12">
-            <HomeIcon className="h-6 w-6" />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-12 w-12 hover:bg-transparent hover:text-white"
+            onClick={() => deleteWord(currentIndex)}
+          >
+            <Trash2 className="h-6 w-6" />
           </Button>
         </div>
       </div>
