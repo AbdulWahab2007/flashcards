@@ -9,14 +9,24 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { Plus, Settings, Trash2 } from "lucide-react";
+import { HomeIcon, Menu, Plus, Settings, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 interface WordItem {
   word: string;
   definition: string;
 }
 
 export default function Home() {
+  const [position, setPosition] = useState("random");
   const [words, setWords] = useState<WordItem[]>([]);
   const [visibleDefinitions, setVisibleDefinitions] = useState<{
     [key: number]: boolean;
@@ -77,12 +87,12 @@ export default function Home() {
       toast.success("Another word enters the Hall of Knowledge! 🏛️");
     }
   };
-  const deleteWord = (index: number) => {
-    const updatedWords = words.filter((_, i) => i !== index);
-    setWords(updatedWords);
-    localStorage.setItem("words", JSON.stringify(updatedWords));
-    toast.error("Poof! That word just vanished into the void. 🚀");
-  };
+  // const deleteWord = (index: number) => {
+  //   const updatedWords = words.filter((_, i) => i !== index);
+  //   setWords(updatedWords);
+  //   localStorage.setItem("words", JSON.stringify(updatedWords));
+  //   toast.error("Poof! That word just vanished into the void. 🚀");
+  // };
   console.log(currentIndex);
 
   return (
@@ -101,9 +111,10 @@ export default function Home() {
             }
           `}</style>
           {words.length == 0 ? (
-            <div className="h-full w-full flex justify-center items-center">
-              <p className="text-3xl text-gray-400 font-openSans">
-                No words to show
+            <div className="h-full w-full p-4 flex justify-center items-center">
+              <p className="text-2xl text-gray-400 font-openSans">
+                The void is empty... for now. Add some words to bring it to
+                life! ✨
               </p>
             </div>
           ) : (
@@ -135,26 +146,39 @@ export default function Home() {
       <div className="fixed top-0 left-0 right-0 border-b border-white/10 bg-[#121212]/80 backdrop-blur-sm">
         <div className="flex justify-between items-center p-2 mx-auto ">
           <p className="font-poppins font-semibold text-2xl pl-2">Flashcards</p>
-          <Button variant="ghost" size="icon" className="h-12 w-12">
-            <Settings className="h-6 w-6" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="w-12 h-12">
+                <Menu className="w-6 h-6" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 text-white bg-[#121212] border-white/10 mt-1">
+              <DropdownMenuRadioGroup
+                value={position}
+                onValueChange={setPosition}
+              >
+                <DropdownMenuRadioItem value="random">
+                  Sort randomly
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="byDate">
+                  Sort by date
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       <div className="fixed bottom-0 left-0 right-0 border-t border-white/10 bg-[#121212]/80 backdrop-blur-sm">
         <div className="flex justify-between items-center p-2 mx-auto ">
-          <div className="flex items-center justify-center h-12 w-12 select-none">
-            <p className="font-openSans text-sm">
-              {words.length == 0
-                ? currentIndex + " / " + words.length
-                : currentIndex + 1 + " / " + words.length}
-            </p>
-          </div>
+          <Button variant="ghost" size="icon" className="h-12 w-12">
+            <HomeIcon className="h-6 w-6" />
+          </Button>
 
           <Drawer>
             <DrawerTrigger asChild>
               <Button
                 size="icon"
-                className="h-12 w-12 rounded-full border-2 border-white/10"
+                className="h-12 w-12 rounded-full bg-neutral-900"
               >
                 <Plus className="h-6 w-6" />
               </Button>
@@ -196,13 +220,8 @@ export default function Home() {
             </DrawerContent>
           </Drawer>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-12 w-12 hover:bg-transparent hover:text-white"
-            onClick={() => deleteWord(currentIndex)}
-          >
-            <Trash2 className="h-6 w-6" />
+          <Button variant="ghost" size="icon" className="h-12 w-12">
+            <Settings className="h-6 w-6" />
           </Button>
         </div>
       </div>
