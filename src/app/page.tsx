@@ -9,15 +9,13 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { HomeIcon, Menu, Plus, Settings, Trash2 } from "lucide-react";
+import { HomeIcon, Menu, Plus, Settings } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 interface WordItem {
