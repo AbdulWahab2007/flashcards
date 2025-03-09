@@ -195,6 +195,11 @@ export default function Home() {
         <div className="flex justify-between items-center p-2 mx-auto ">
           <Button variant="ghost" size="icon" className="h-12 w-12">
             <HomeIcon className="h-6 w-6" />
+            <p>
+              {words.length == 0
+                ? currentIndex + " / " + words.length
+                : currentIndex + 1 + " / " + words.length}
+            </p>
           </Button>
 
           <Drawer>
