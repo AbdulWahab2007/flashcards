@@ -18,9 +18,12 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 interface WordItem {
   word: string;
   definition: string;
+  tags: Array<string>;
 }
 
 export default function Home() {
@@ -31,6 +34,8 @@ export default function Home() {
   }>({});
   const [newWord, setNewWord] = useState("");
   const [newDefinition, setNewDefinition] = useState("");
+  const [newTags, setNewTags] = useState<string[]>([]);
+  const [tagValue, setTagValue] = useState<string>("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -71,17 +76,26 @@ export default function Home() {
       [index]: !prev[index],
     }));
   };
-
+  const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTagValue(e.target.value);
+    const tags = e.target.value
+      .split(",")
+      .map((tag: string) => tag.trim())
+      .filter((tag: string) => tag !== "");
+    setNewTags(tags);
+  };
   const addWord = () => {
-    if (newWord && newDefinition) {
+    if (newWord && newDefinition && newTags) {
       const updatedWords = [
         ...words,
-        { word: newWord, definition: newDefinition },
+        { word: newWord, definition: newDefinition, tags: newTags },
       ];
       setWords(updatedWords);
       localStorage.setItem("words", JSON.stringify(updatedWords));
       setNewWord("");
       setNewDefinition("");
+      setNewTags([]);
+      setTagValue("");
       toast.success("Another word enters the Hall of Knowledge! 🏛️");
     }
   };
@@ -91,8 +105,6 @@ export default function Home() {
   //   localStorage.setItem("words", JSON.stringify(updatedWords));
   //   toast.error("Poof! That word just vanished into the void. 🚀");
   // };
-  console.log(currentIndex);
-
   return (
     <div className="flex flex-col min-h-screen bg-[#121212] text-white">
       <main className="flex-1 relative">
@@ -125,11 +137,24 @@ export default function Home() {
                 className="h-screen flex items-center justify-center snap-start px-4 cursor-pointer"
                 onClick={() => toggleDefinition(index)}
               >
-                <div className="max-w-md border-2 rounded-3xl border-gray-400 p-1  h-[65%] flex items-center justify-center w-full space-y-4 text-center">
+                <div className="max-w-md border-2 rounded-3xl border-gray-400 p-1  h-[45%] flex flex-col items-center justify-center w-[80%] space-y-4 text-center">
                   {visibleDefinitions[index] ? (
-                    <p className="text-xl text-gray-300 font-opensans">
-                      {item.definition}
-                    </p>
+                    <div className="flex flex-col w-full">
+                      <p className="text-xl text-gray-300 font-opensans">
+                        {item.definition}
+                      </p>
+                      <div className="flex justify-center items-center">
+                        {item.tags.map((tags, num) => (
+                          <Badge
+                            key={num}
+                            variant="outline"
+                            className="text-white m-2 font-openSans"
+                          >
+                            {tags}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
                   ) : (
                     <h1 className="text-4xl font-bold font-poppins">
                       {item.word}
@@ -191,10 +216,16 @@ export default function Home() {
                     onChange={(e) => setNewWord(e.target.value)}
                     className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-400 font-opensans"
                   />
-                  <Input
+                  <Textarea
                     placeholder="Enter definition"
                     value={newDefinition}
                     onChange={(e) => setNewDefinition(e.target.value)}
+                    className="h-28 bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-400 font-opensans"
+                  />
+                  <Input
+                    placeholder="Enter tags. (separated by comma)"
+                    value={tagValue}
+                    onChange={handleTagsChange}
                     className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-400 font-opensans"
                   />
                 </div>
