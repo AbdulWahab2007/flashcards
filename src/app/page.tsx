@@ -9,7 +9,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { HomeIcon, Menu, Plus, Settings } from "lucide-react";
+import { HomeIcon, Menu, Plus, Settings, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   DropdownMenu,
@@ -27,8 +27,9 @@ interface WordItem {
 }
 
 export default function Home() {
-  const [position, setPosition] = useState("random");
+  const [renderType, setRenderType] = useState("bySequence");
   const [words, setWords] = useState<WordItem[]>([]);
+  const [displayedWords, setDisplayedWords] = useState<WordItem[]>(words);
   const [visibleDefinitions, setVisibleDefinitions] = useState<{
     [key: number]: boolean;
   }>({});
@@ -67,6 +68,7 @@ export default function Home() {
     const storedWords = localStorage.getItem("words");
     if (storedWords) {
       setWords(JSON.parse(storedWords));
+      setDisplayedWords(JSON.parse(storedWords));
     }
   }, []);
 
@@ -91,6 +93,7 @@ export default function Home() {
         { word: newWord, definition: newDefinition, tags: newTags },
       ];
       setWords(updatedWords);
+      setDisplayedWords(updatedWords);
       localStorage.setItem("words", JSON.stringify(updatedWords));
       setNewWord("");
       setNewDefinition("");
@@ -99,12 +102,23 @@ export default function Home() {
       toast.success("Another word enters the Hall of Knowledge! 🏛️");
     }
   };
-  // const deleteWord = (index: number) => {
-  //   const updatedWords = words.filter((_, i) => i !== index);
-  //   setWords(updatedWords);
-  //   localStorage.setItem("words", JSON.stringify(updatedWords));
-  //   toast.error("Poof! That word just vanished into the void. 🚀");
-  // };
+  const deleteWord = (index: number) => {
+    if (words.length === 0) {
+      toast.error("There's nothing to delete! 🚫");
+      return;
+    }
+    const updatedWords = words.filter((_, i) => i !== index);
+    setWords(updatedWords);
+    setDisplayedWords(updatedWords);
+    localStorage.setItem("words", JSON.stringify(updatedWords));
+    toast.error("Poof! That word just vanished into the void. 🚀");
+  };
+  const shuffleArray = (arr: Array<WordItem>) => {
+    return [...arr].sort(() => Math.random() - 0.5);
+  };
+  useEffect(() => {
+    setDisplayedWords(renderType === "random" ? shuffleArray(words) : words);
+  }, [renderType, words]);
   return (
     <div className="flex flex-col min-h-screen bg-[#121212] text-white">
       <main className="flex-1 relative">
@@ -128,7 +142,7 @@ export default function Home() {
               </p>
             </div>
           ) : (
-            words.map((item, index) => (
+            displayedWords.map((item, index) => (
               <div
                 key={index}
                 ref={(el) => {
@@ -177,14 +191,14 @@ export default function Home() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 text-white bg-[#121212] border-white/10 mt-1">
               <DropdownMenuRadioGroup
-                value={position}
-                onValueChange={setPosition}
+                value={renderType}
+                onValueChange={setRenderType}
               >
+                <DropdownMenuRadioItem value="bySequence">
+                  Sort by sequence
+                </DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="random">
                   Sort randomly
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="byDate">
-                  Sort by date
                 </DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
@@ -195,6 +209,8 @@ export default function Home() {
         <div className="flex justify-between items-center p-2 mx-auto ">
           <Button variant="ghost" size="icon" className="h-12 w-12">
             <HomeIcon className="h-6 w-6" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-12 w-12">
             <p>
               {words.length == 0
                 ? currentIndex + " / " + words.length
@@ -256,6 +272,14 @@ export default function Home() {
 
           <Button variant="ghost" size="icon" className="h-12 w-12">
             <Settings className="h-6 w-6" />
+          </Button>
+          <Button
+            onClick={() => deleteWord(currentIndex)}
+            variant="ghost"
+            size="icon"
+            className="h-12 w-12"
+          >
+            <Trash2 className="h-6 w-6" />
           </Button>
         </div>
       </div>
