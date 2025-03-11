@@ -9,7 +9,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { HomeIcon, Menu, Plus, Settings, Trash2 } from "lucide-react";
+import { HomeIcon, Menu, Plus, Search, Settings, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   DropdownMenu,
@@ -39,6 +39,8 @@ export default function Home() {
   const [tagValue, setTagValue] = useState<string>("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [noResults, setNoResults] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -116,6 +118,24 @@ export default function Home() {
   const shuffleArray = (arr: Array<WordItem>) => {
     return [...arr].sort(() => Math.random() - 0.5);
   };
+  const handleSearch = () => {
+    if (searchQuery.trim() === "") {
+      setDisplayedWords(words);
+      setNoResults(false);
+      return;
+    }
+    const searchTags = searchQuery
+      .split(",")
+      .map((tag) => tag.trim().toLowerCase())
+      .filter((tag) => tag !== "");
+
+    const filteredWords = words.filter((word) =>
+      word.tags.some((tag) => searchTags.includes(tag.toLowerCase()))
+    );
+
+    setDisplayedWords(filteredWords);
+    setNoResults(filteredWords.length === 0);
+  };
   useEffect(() => {
     setDisplayedWords(renderType === "random" ? shuffleArray(words) : words);
   }, [renderType, words]);
@@ -139,6 +159,12 @@ export default function Home() {
               <p className="text-2xl text-gray-400 font-openSans">
                 The void is empty... for now. Add some words to bring it to
                 life! ✨
+              </p>
+            </div>
+          ) : noResults ? (
+            <div className="h-full w-full p-4 flex justify-center items-center">
+              <p className="text-2xl text-gray-400 font-openSans">
+                Oops! That tag must be hiding. Try a different one! 😅
               </p>
             </div>
           ) : (
@@ -181,7 +207,7 @@ export default function Home() {
         </div>
       </main>
       <div className="fixed top-0 left-0 right-0 border-b border-white/10 bg-[#121212]/80 backdrop-blur-sm">
-        <div className="flex justify-between items-center p-2 mx-auto ">
+        <div className="flex justify-between items-center p-2 mx-auto border-b border-white/10">
           <p className="font-poppins font-semibold text-2xl pl-2">Flashcards</p>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -203,6 +229,23 @@ export default function Home() {
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
+        </div>
+        <div className=" w-full h-12 flex items-center px-2">
+          <div className="relative w-full">
+            <Input
+              placeholder="Search with tags (e.g., tech, science)"
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-400 font-opensans pr-10"
+            />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+              onClick={handleSearch}
+            >
+              <Search className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
       </div>
       <div className="fixed bottom-0 left-0 right-0 border-t border-white/10 bg-[#121212]/80 backdrop-blur-sm">
