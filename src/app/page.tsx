@@ -20,10 +20,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import NotificationComponent from "@/components/ui/notificationComponent";
 interface WordItem {
   word: string;
   definition: string;
   tags: Array<string>;
+  index: number;
 }
 
 export default function Home() {
@@ -65,12 +67,40 @@ export default function Home() {
 
     return () => observer.disconnect();
   }, [words]);
-
+  const scrollToWord = (index: number) => {
+    if (cardRefs.current[index]) {
+      cardRefs.current[index]?.scrollIntoView({ behavior: "smooth" });
+      setCurrentIndex(index);
+    }
+  };
   useEffect(() => {
     const storedWords = localStorage.getItem("words");
     if (storedWords) {
-      setWords(JSON.parse(storedWords));
-      setDisplayedWords(JSON.parse(storedWords));
+      const parsedWords = JSON.parse(storedWords).map(
+        (word: WordItem, index: number) => ({
+          ...word,
+          index,
+        })
+      );
+      setWords(parsedWords);
+      setDisplayedWords(parsedWords);
+
+      // Check if opened from notification
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.ready.then((registration) => {
+          registration.getNotifications().then((notifications) => {
+            if (notifications.length > 0) {
+              const notification = notifications[0];
+              const wordIndex = notification.data?.wordIndex;
+              notification.close();
+
+              if (wordIndex !== undefined) {
+                scrollToWord(wordIndex);
+              }
+            }
+          });
+        });
+      }
     }
   }, []);
 
@@ -92,7 +122,12 @@ export default function Home() {
     if (newWord && newDefinition && newTags) {
       const updatedWords = [
         ...words,
-        { word: newWord, definition: newDefinition, tags: newTags },
+        {
+          word: newWord,
+          definition: newDefinition,
+          tags: newTags,
+          index: words.length,
+        },
       ];
       setWords(updatedWords);
       setDisplayedWords(updatedWords);
@@ -324,6 +359,7 @@ export default function Home() {
           >
             <Trash2 className="h-6 w-6" />
           </Button>
+          <NotificationComponent words={words} />
         </div>
       </div>
     </div>
