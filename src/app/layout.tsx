@@ -8,10 +8,14 @@ import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Flash",
-  description: "A flashcard app for you ease.",
-  viewport: "width=device-width, initial-scale=1",
-  themeColor: "#000000",
+  description: "A flashcard app for your ease.",
   manifest: "/manifest.json",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#000000",
 };
 
 const redHatDisplay = Red_Hat_Display({

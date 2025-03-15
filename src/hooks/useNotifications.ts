@@ -1,7 +1,10 @@
+"use client";
 import { useState, useEffect } from "react";
 
 const useNotifications = () => {
-  const [permission, setPermission] = useState(Notification.permission);
+  const [permission, setPermission] = useState(
+    typeof window !== "undefined" ? Notification.permission : "default"
+  );
 
   useEffect(() => {
     Notification.requestPermission().then((newPermission) => {
