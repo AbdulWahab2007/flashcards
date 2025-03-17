@@ -13,5 +13,14 @@ const nextConfig: NextConfig = {
 };
 
 module.exports = withPWA(nextConfig);
-
+module.exports = {
+  async rewrites() {
+    return [
+      {
+        source: "/sw.js",
+        destination: "/public/sw.js",
+      },
+    ];
+  },
+};
 export default nextConfig;
