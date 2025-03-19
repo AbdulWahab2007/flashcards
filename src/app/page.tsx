@@ -66,7 +66,7 @@ export default function Home() {
     });
 
     return () => observer.disconnect();
-  }, [words]);
+  }, [displayedWords]);
   const scrollToWord = (index: number) => {
     if (cardRefs.current[index]) {
       cardRefs.current[index]?.scrollIntoView({ behavior: "smooth" });
@@ -78,14 +78,15 @@ export default function Home() {
     if (storedWords) {
       const parsedWords = JSON.parse(storedWords).map(
         (word: WordItem, index: number) => ({
-          ...word,
+          word: word.word,
+          definition: word.definition,
+          tags: word.tags,
           index,
         })
       );
       setWords(parsedWords);
       setDisplayedWords(parsedWords);
 
-      // Check if opened from notification
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker.ready.then((registration) => {
           registration.getNotifications().then((notifications) => {
@@ -144,7 +145,9 @@ export default function Home() {
       toast.error("There's nothing to delete! 🚫");
       return;
     }
-    const updatedWords = words.filter((_, i) => i !== index);
+    const updatedWords = words
+      .filter((_, i) => i !== index)
+      .map((word, i) => ({ ...word, index: i }));
     setWords(updatedWords);
     setDisplayedWords(updatedWords);
     localStorage.setItem("words", JSON.stringify(updatedWords));
@@ -347,10 +350,6 @@ export default function Home() {
               </div>
             </DrawerContent>
           </Drawer>
-
-          <Button variant="ghost" size="icon" className="h-12 w-12">
-            <Settings className="h-6 w-6" />
-          </Button>
           <Button
             onClick={() => deleteWord(currentIndex)}
             variant="ghost"
@@ -359,6 +358,10 @@ export default function Home() {
           >
             <Trash2 className="h-6 w-6" />
           </Button>
+          <Button variant="ghost" size="icon" className="h-12 w-12">
+            <Settings className="h-6 w-6" />
+          </Button>
+
           <NotificationComponent words={words} />
         </div>
       </div>
