@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import {
+  Check,
   FilterIcon,
   HomeIcon,
   Plus,
@@ -22,8 +23,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
@@ -32,6 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -45,7 +46,7 @@ interface WordItem {
 }
 
 export default function Home() {
-  const [renderType, setRenderType] = useState("bySequence");
+  const [renderType, setRenderType] = useState("dateAsc");
   const [words, setWords] = useState<WordItem[]>([]);
   const [displayedWords, setDisplayedWords] = useState<WordItem[]>(words);
   const [visibleDefinitions, setVisibleDefinitions] = useState<{
@@ -59,8 +60,12 @@ export default function Home() {
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [noResults, setNoResults] = useState(false);
-  const uniqueTags = Array.from(new Set(words.flatMap((word) => word.tags)));
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const uniqueTags = Array.from(
+    new Set(words.flatMap((word) => word.tags.map((tag) => tag.toLowerCase())))
+  );
+  const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -155,11 +160,13 @@ export default function Home() {
       setNewTags([]);
       setTagValue("");
       toast.success("Another word enters the Hall of Knowledge! 🏛️");
+      setIsAddDrawerOpen(false);
     }
   };
   const deleteWord = (index: number) => {
     if (words.length === 0) {
       toast.error("There's nothing to delete! 🚫");
+      setIsDeleteDialogOpen(false);
       return;
     }
     const updatedWords = words
@@ -169,6 +176,7 @@ export default function Home() {
     setDisplayedWords(updatedWords);
     localStorage.setItem("words", JSON.stringify(updatedWords));
     toast.error("Poof! That word just vanished into the void. 🚀");
+    setIsDeleteDialogOpen(false);
   };
   const shuffleArray = (arr: Array<WordItem>) => {
     return [...arr].sort(() => Math.random() - 0.5);
@@ -198,7 +206,15 @@ export default function Home() {
     setDisplayedWords(words);
   };
   useEffect(() => {
-    setDisplayedWords(renderType === "random" ? shuffleArray(words) : words);
+    setDisplayedWords(
+      renderType === "random"
+        ? shuffleArray(words)
+        : renderType === "dateAsc"
+        ? words
+        : renderType === "dateDes"
+        ? [...words].reverse()
+        : words
+    );
   }, [renderType, words]);
   return (
     <div className="flex flex-col min-h-screen bg-[#121212] text-white">
@@ -206,9 +222,16 @@ export default function Home() {
         <div className="w-screen h-screen flex items-center justify-center ">
           <div className="w-[13%] h-[69%]  absolute flex flex-col justify-between right-0">
             <div className="w-full  flex flex-col justify-center items-center p-2">
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <Dialog
+                open={isSearchDialogOpen}
+                onOpenChange={setIsSearchDialogOpen}
+              >
                 <DialogTrigger asChild>
-                  <Button variant="ghost" size="icon" className="w-12 h-12">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-12 h-12 bg-transparent hover:bg-transparent text-white hover:text-white"
+                  >
                     <FilterIcon className="!h-6 !w-6" />
                   </Button>
                 </DialogTrigger>
@@ -230,7 +253,7 @@ export default function Home() {
                     {uniqueTags.map((tag, index) => (
                       <Badge
                         key={index}
-                        className="mx-2 my-1 px-3 text-white font-openSans rounded-sm cursor-pointer"
+                        className="mx-2 my-1 px-3 text-white font-openSans rounded-lg cursor-pointer"
                         variant="outline"
                         onClick={() =>
                           setSearchQuery((prev) =>
@@ -250,7 +273,7 @@ export default function Home() {
                         className="font-poppins"
                         onClick={() => {
                           handleSearch();
-                          setIsDialogOpen(false);
+                          setIsSearchDialogOpen(false);
                         }}
                       >
                         Apply
@@ -261,34 +284,51 @@ export default function Home() {
               </Dialog>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="w-12 h-12">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-12 h-12 bg-transparent hover:bg-transparent text-white hover:text-white"
+                  >
                     <SortDesc className="!h-6 !w-6" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 text-white bg-[#121212] border-white/10 mt-1">
-                  <DropdownMenuRadioGroup
-                    value={renderType}
-                    onValueChange={setRenderType}
+                <DropdownMenuContent className="w-56 text-white bg-[#121212] border-white/10 -mt-12 mr-12">
+                  <DropdownMenuItem
+                    onSelect={() => setRenderType("dateAsc")}
+                    className="flex items-center justify-between px-2 py-1"
                   >
-                    <DropdownMenuRadioItem value="bySequence">
-                      Sort by sequence
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="random">
-                      Sort randomly
-                    </DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
+                    Date added (ascending)
+                    {renderType === "dateAsc" && <Check className="w-4 h-4" />}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => setRenderType("dateDes")}
+                    className="flex items-center justify-between px-2 py-1 border-t border-b border-white/10"
+                  >
+                    Date added (descending)
+                    {renderType === "dateDes" && <Check className="w-4 h-4" />}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => setRenderType("random")}
+                    className="flex items-center justify-between px-2 py-1"
+                  >
+                    Random
+                    {renderType === "random" && <Check className="w-4 h-4" />}
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-12 w-12"
-                onClick={() => {
-                  handleSearchReset();
-                }}
-              >
-                <SearchX className="!h-6 !w-6" />
-              </Button>
+              {searchQuery.trim() !== "" && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-12 w-12"
+                  onClick={() => {
+                    handleSearchReset();
+                    setSearchQuery(""); // Clear search query
+                  }}
+                >
+                  <SearchX className="!h-6 !w-6" />
+                </Button>
+              )}
             </div>
             <div className="w-full  flex flex-col justify-center items-center p-2">
               <Button variant="ghost" size="icon" className="h-12 w-12">
@@ -300,14 +340,51 @@ export default function Home() {
                       }`}
                 </p>
               </Button>
-              <Button
-                onClick={() => deleteWord(currentIndex)}
-                variant="ghost"
-                size="icon"
-                className="h-12 w-12"
+
+              <Dialog
+                open={isDeleteDialogOpen}
+                onOpenChange={setIsDeleteDialogOpen}
               >
-                <Trash2 className="!h-6 !w-6" />
-              </Button>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-12 w-12">
+                    <Trash2 className="!h-6 !w-6" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px] w-[90%] rounded-lg border-zinc-800 bg-[#121212] text-white flex flex-col justify-start items-start">
+                  <DialogHeader className="w-full flex flex-col items-start">
+                    <DialogTitle className="font-poppins">
+                      Are you sure?
+                    </DialogTitle>
+                    <DialogDescription>
+                      Do you really want to delete this word?
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter className="flex w-full -m-2">
+                    <div className="w-full flex justify-end">
+                      <Button
+                        type="submit"
+                        className="font-poppins bg-[#121212] text-white mx-2"
+                        variant="outline"
+                        onClick={() => {
+                          setIsDeleteDialogOpen(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        className="font-poppins"
+                        variant="destructive"
+                        onClick={() => {
+                          deleteWord(currentIndex);
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
           <div
@@ -384,11 +461,16 @@ export default function Home() {
       </div>
       <div className="fixed bottom-0 left-0 right-0 border-t border-white/10 bg-[#121212]/80 backdrop-blur-sm">
         <div className="flex justify-between items-center p-2 mx-auto ">
-          <Button variant="ghost" size="icon" className="h-12 w-12">
-            <HomeIcon className="!h-6 !w-6" />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-12 w-12 flex flex-col justify-center items-center"
+          >
+            <HomeIcon className="!h-6 !w-6 -mb-2" />
+            <p className="font-openSans">Home</p>
           </Button>
 
-          <Drawer>
+          <Drawer open={isAddDrawerOpen} onOpenChange={setIsAddDrawerOpen}>
             <DrawerTrigger asChild>
               <Button
                 size="icon"
@@ -422,7 +504,9 @@ export default function Home() {
                 </div>
                 <div className="pt-6 pb-4 space-y-4">
                   <Button
-                    onClick={addWord}
+                    onClick={() => {
+                      addWord();
+                    }}
                     className="w-full bg-white text-black hover:bg-white/90 font-poppins"
                   >
                     Add Word
@@ -439,8 +523,13 @@ export default function Home() {
               </div>
             </DrawerContent>
           </Drawer>
-          <Button variant="ghost" size="icon" className="h-12 w-12">
-            <Settings className="!h-6 !w-6" />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-12 w-12 flex flex-col justify-center items-center"
+          >
+            <Settings className="!h-6 !w-6 -mb-2" />
+            <p className="font-openSans">Settings</p>
           </Button>
 
           {/* <NotificationComponent words={words} /> */}
