@@ -9,7 +9,15 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { HomeIcon, Menu, Plus, Search, Settings, Trash2 } from "lucide-react";
+import {
+  FilterIcon,
+  HomeIcon,
+  Plus,
+  SearchX,
+  Settings,
+  SortDesc,
+  Trash2,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   DropdownMenu,
@@ -20,7 +28,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import NotificationComponent from "@/components/ui/notificationComponent";
+// import NotificationComponent from "@/components/ui/notificationComponent";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 interface WordItem {
   word: string;
   definition: string;
@@ -43,7 +59,8 @@ export default function Home() {
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [noResults, setNoResults] = useState(false);
-
+  const uniqueTags = Array.from(new Set(words.flatMap((word) => word.tags)));
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -167,12 +184,18 @@ export default function Home() {
       .map((tag) => tag.trim().toLowerCase())
       .filter((tag) => tag !== "");
 
-    const filteredWords = words.filter((word) =>
-      word.tags.some((tag) => searchTags.includes(tag.toLowerCase()))
-    );
+    const filteredWords =
+      searchQuery.trim() === ""
+        ? words
+        : words.filter((word) =>
+            word.tags.some((tag) => searchTags.includes(tag.toLowerCase()))
+          );
 
     setDisplayedWords(filteredWords);
     setNoResults(filteredWords.length === 0);
+  };
+  const handleSearchReset = () => {
+    setDisplayedWords(words);
   };
   useEffect(() => {
     setDisplayedWords(renderType === "random" ? shuffleArray(words) : words);
@@ -180,123 +203,189 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-[#121212] text-white">
       <main className="flex-1 relative">
-        <div
-          className="fixed inset-0 overflow-y-auto snap-y snap-mandatory"
-          style={{
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-          }}
-        >
-          <style jsx global>{`
-            .snap-mandatory::-webkit-scrollbar {
-              display: none;
-            }
-          `}</style>
-          {words.length == 0 ? (
-            <div className="h-full w-full p-4 flex justify-center items-center">
-              <p className="text-2xl text-gray-400 font-openSans">
-                The void is empty... for now. Add some words to bring it to
-                life! ✨
-              </p>
-            </div>
-          ) : noResults ? (
-            <div className="h-full w-full p-4 flex justify-center items-center">
-              <p className="text-2xl text-gray-400 font-openSans">
-                Oops! That tag must be hiding. Try a different one! 😅
-              </p>
-            </div>
-          ) : (
-            displayedWords.map((item, index) => (
-              <div
-                key={index}
-                ref={(el) => {
-                  cardRefs.current[index] = el;
-                }}
-                className="h-screen flex items-center justify-center snap-start px-4 cursor-pointer"
-                onClick={() => toggleDefinition(index)}
-              >
-                <div className="max-w-md border-2 rounded-3xl border-gray-400 p-1  h-[45%] flex flex-col items-center justify-center w-[80%] space-y-4 text-center">
-                  {visibleDefinitions[index] ? (
-                    <div className="flex flex-col w-full">
-                      <p className="text-xl text-gray-300 font-opensans">
-                        {item.definition}
-                      </p>
-                      <div className="flex justify-center items-center">
-                        {item.tags.map((tags, num) => (
-                          <Badge
-                            key={num}
-                            variant="outline"
-                            className="text-white m-2 font-openSans"
-                          >
-                            {tags}
-                          </Badge>
-                        ))}
-                      </div>
+        <div className="w-screen h-screen flex items-center justify-center ">
+          <div className="w-[13%] h-[69%]  absolute flex flex-col justify-between right-0">
+            <div className="w-full  flex flex-col justify-center items-center p-2">
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="icon" className="w-12 h-12">
+                    <FilterIcon className="!h-6 !w-6" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px] w-[90%] rounded-lg border-zinc-800 bg-[#121212] text-white flex flex-col justify-start items-start">
+                  <DialogHeader>
+                    <DialogTitle className="font-poppins">
+                      Filter by tags
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="pr-2 w-full">
+                    <Input
+                      value={searchQuery}
+                      placeholder="Search with tags (e.g., tech, science)"
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-400 font-opensans pr-10"
+                    />
+                  </div>
+                  <div className="flex -ml-2 w-full flex-wrap">
+                    {uniqueTags.map((tag, index) => (
+                      <Badge
+                        key={index}
+                        className="mx-2 my-1 px-3 text-white font-openSans rounded-sm cursor-pointer"
+                        variant="outline"
+                        onClick={() =>
+                          setSearchQuery((prev) =>
+                            prev ? `${prev}, ${tag}` : tag
+                          )
+                        }
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+
+                  <DialogFooter className="flex w-full -m-2">
+                    <div className="w-full flex justify-end">
+                      <Button
+                        type="submit"
+                        className="font-poppins"
+                        onClick={() => {
+                          handleSearch();
+                          setIsDialogOpen(false);
+                        }}
+                      >
+                        Apply
+                      </Button>
                     </div>
-                  ) : (
-                    <h1 className="text-4xl font-bold font-poppins">
-                      {item.word}
-                    </h1>
-                  )}
-                </div>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="w-12 h-12">
+                    <SortDesc className="!h-6 !w-6" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 text-white bg-[#121212] border-white/10 mt-1">
+                  <DropdownMenuRadioGroup
+                    value={renderType}
+                    onValueChange={setRenderType}
+                  >
+                    <DropdownMenuRadioItem value="bySequence">
+                      Sort by sequence
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="random">
+                      Sort randomly
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-12 w-12"
+                onClick={() => {
+                  handleSearchReset();
+                }}
+              >
+                <SearchX className="!h-6 !w-6" />
+              </Button>
+            </div>
+            <div className="w-full  flex flex-col justify-center items-center p-2">
+              <Button variant="ghost" size="icon" className="h-12 w-12">
+                <p className="font-openSans text-base">
+                  {displayedWords.length === 0
+                    ? "0 / 0"
+                    : `${Math.min(currentIndex + 1, displayedWords.length)} / ${
+                        displayedWords.length
+                      }`}
+                </p>
+              </Button>
+              <Button
+                onClick={() => deleteWord(currentIndex)}
+                variant="ghost"
+                size="icon"
+                className="h-12 w-12"
+              >
+                <Trash2 className="!h-6 !w-6" />
+              </Button>
+            </div>
+          </div>
+          <div
+            className="overflow-y-auto snap-y snap-mandatory h-screen w-[80%] "
+            style={{
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
+            <style jsx global>{`
+              .snap-mandatory::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
+            {words.length == 0 ? (
+              <div className="h-full w-full p-4 flex justify-center items-center">
+                <p className="text-2xl text-gray-400 font-openSans">
+                  The void is empty... for now. Add some words to bring it to
+                  life! ✨
+                </p>
               </div>
-            ))
-          )}
+            ) : noResults ? (
+              <div className="h-full w-full p-4 flex justify-center items-center">
+                <p className="text-2xl text-gray-400 font-openSans">
+                  Oops! That tag must be hiding. Try a different one! 😅
+                </p>
+              </div>
+            ) : (
+              displayedWords.map((item, index) => (
+                <div
+                  key={index}
+                  ref={(el) => {
+                    cardRefs.current[index] = el;
+                  }}
+                  className="h-screen flex items-center justify-center snap-start px-4 cursor-pointer"
+                >
+                  <div
+                    onClick={() => toggleDefinition(index)}
+                    className="max-w-md border-2 rounded-lg border-gray-400 p-1  h-[65%] flex flex-col items-center justify-center w-full space-y-4 text-center"
+                  >
+                    {visibleDefinitions[index] ? (
+                      <div className="flex flex-col w-full">
+                        <p className="text-xl text-gray-300 font-opensans">
+                          {item.definition}
+                        </p>
+                        <div className="flex justify-center items-center">
+                          {item.tags.map((tags, num) => (
+                            <Badge
+                              key={num}
+                              variant="outline"
+                              className="text-white m-2 font-openSans"
+                            >
+                              {tags}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <h1 className="text-4xl font-bold font-poppins">
+                        {item.word}
+                      </h1>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </main>
       <div className="fixed top-0 left-0 right-0 border-b border-white/10 bg-[#121212]/80 backdrop-blur-sm">
-        <div className="flex justify-between items-center p-2 mx-auto border-b border-white/10">
-          <p className="font-poppins font-semibold text-2xl pl-2">Flashcards</p>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="w-12 h-12">
-                <Menu className="w-6 h-6" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 text-white bg-[#121212] border-white/10 mt-1">
-              <DropdownMenuRadioGroup
-                value={renderType}
-                onValueChange={setRenderType}
-              >
-                <DropdownMenuRadioItem value="bySequence">
-                  Sort by sequence
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="random">
-                  Sort randomly
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        <div className=" w-full h-12 flex items-center px-2">
-          <div className="relative w-full">
-            <Input
-              placeholder="Search with tags (e.g., tech, science)"
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-400 font-opensans pr-10"
-            />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
-              onClick={handleSearch}
-            >
-              <Search className="h-5 w-5" />
-            </Button>
-          </div>
+        <div className="flex justify-between items-center p-4 mx-auto">
+          <p className="font-poppins font-semibold text-2xl">Flash</p>
         </div>
       </div>
       <div className="fixed bottom-0 left-0 right-0 border-t border-white/10 bg-[#121212]/80 backdrop-blur-sm">
         <div className="flex justify-between items-center p-2 mx-auto ">
           <Button variant="ghost" size="icon" className="h-12 w-12">
-            <HomeIcon className="h-6 w-6" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-12 w-12">
-            <p>
-              {words.length == 0
-                ? currentIndex + " / " + words.length
-                : currentIndex + 1 + " / " + words.length}
-            </p>
+            <HomeIcon className="!h-6 !w-6" />
           </Button>
 
           <Drawer>
@@ -305,7 +394,7 @@ export default function Home() {
                 size="icon"
                 className="h-12 w-12 rounded-full bg-neutral-900"
               >
-                <Plus className="h-6 w-6" />
+                <Plus className="!h-6 !w-6" />
               </Button>
             </DrawerTrigger>
             <DrawerTitle className="hidden"></DrawerTitle>
@@ -350,19 +439,11 @@ export default function Home() {
               </div>
             </DrawerContent>
           </Drawer>
-          <Button
-            onClick={() => deleteWord(currentIndex)}
-            variant="ghost"
-            size="icon"
-            className="h-12 w-12"
-          >
-            <Trash2 className="h-6 w-6" />
-          </Button>
           <Button variant="ghost" size="icon" className="h-12 w-12">
-            <Settings className="h-6 w-6" />
+            <Settings className="!h-6 !w-6" />
           </Button>
 
-          <NotificationComponent words={words} />
+          {/* <NotificationComponent words={words} /> */}
         </div>
       </div>
     </div>
