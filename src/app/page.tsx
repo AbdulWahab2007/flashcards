@@ -38,6 +38,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import ThemeToggle from "@/components/ui/themeToggle";
+import Link from "next/link";
 interface WordItem {
   word: string;
   definition: string;
@@ -217,7 +219,7 @@ export default function Home() {
     );
   }, [renderType, words]);
   return (
-    <div className="flex flex-col min-h-screen bg-[#121212] text-white">
+    <div className="flex flex-col min-h-screen dark:bg-backgroundDark dark:text-white">
       <main className="flex-1 relative">
         <div className="w-screen h-screen flex items-center justify-center ">
           <div className="w-[13%] h-[69%]  absolute flex flex-col justify-between right-0">
@@ -230,12 +232,12 @@ export default function Home() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="w-12 h-12 bg-transparent hover:bg-transparent text-white hover:text-white"
+                    className="w-12 h-12 bg-transparent hover:bg-transparent"
                   >
                     <FilterIcon className="!h-6 !w-6" />
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px] w-[90%] rounded-lg border-zinc-800 bg-[#121212] text-white flex flex-col justify-start items-start">
+                <DialogContent className="sm:max-w-[425px] w-[90%] rounded-lg dark:bg-backgroundDark dark:text-white flex flex-col justify-start items-start">
                   <DialogHeader>
                     <DialogTitle className="font-poppins">
                       Filter by tags
@@ -246,14 +248,14 @@ export default function Home() {
                       value={searchQuery}
                       placeholder="Search with tags (e.g., tech, science)"
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-400 font-opensans pr-10"
+                      className="dark:bg-backgroundDark border-borderColor text-white placeholder:text-gray-400 font-opensans pr-10"
                     />
                   </div>
                   <div className="flex -ml-2 w-full flex-wrap">
                     {uniqueTags.map((tag, index) => (
                       <Badge
                         key={index}
-                        className="mx-2 my-1 px-3 text-white font-openSans rounded-lg cursor-pointer"
+                        className="mx-2 my-1 px-3 dark:text-white border border-borderColor font-openSans rounded-lg cursor-pointer"
                         variant="outline"
                         onClick={() =>
                           setSearchQuery((prev) =>
@@ -270,7 +272,8 @@ export default function Home() {
                     <div className="w-full flex justify-end">
                       <Button
                         type="submit"
-                        className="font-poppins"
+                        variant="ghost"
+                        className="font-poppins border border-borderColor dark:bg-backgroundDark bg-gray-200 dark:text-white"
                         onClick={() => {
                           handleSearch();
                           setIsSearchDialogOpen(false);
@@ -287,12 +290,12 @@ export default function Home() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="w-12 h-12 bg-transparent hover:bg-transparent text-white hover:text-white"
+                    className="w-12 h-12 bg-transparent hover:bg-transparent hover:text-white"
                   >
                     <SortDesc className="!h-6 !w-6" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 text-white bg-[#121212] border-white/10 -mt-12 mr-12">
+                <DropdownMenuContent className="w-56 dark:text-white dark:bg-backgroundDark dark:border-white/10 border border-borderColor -mt-12 mr-12">
                   <DropdownMenuItem
                     onSelect={() => setRenderType("dateAsc")}
                     className="flex items-center justify-between px-2 py-1"
@@ -302,7 +305,7 @@ export default function Home() {
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={() => setRenderType("dateDes")}
-                    className="flex items-center justify-between px-2 py-1 border-t border-b border-white/10"
+                    className="flex items-center justify-between px-2 py-1 border-t border-b border-borderColor dark:border-white/10"
                   >
                     Date added (descending)
                     {renderType === "dateDes" && <Check className="w-4 h-4" />}
@@ -350,7 +353,7 @@ export default function Home() {
                     <Trash2 className="!h-6 !w-6" />
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px] w-[90%] rounded-lg border-zinc-800 bg-[#121212] text-white flex flex-col justify-start items-start">
+                <DialogContent className="sm:max-w-[425px] w-[90%] rounded-lg border border-borderColor dark:bg-backgroundDark dark:text-white flex flex-col justify-start items-start">
                   <DialogHeader className="w-full flex flex-col items-start">
                     <DialogTitle className="font-poppins">
                       Are you sure?
@@ -363,7 +366,7 @@ export default function Home() {
                     <div className="w-full flex justify-end">
                       <Button
                         type="submit"
-                        className="font-poppins bg-[#121212] text-white mx-2"
+                        className="font-poppins border-borderColor dark:bg-backgroundDark dark:text-white mx-2"
                         variant="outline"
                         onClick={() => {
                           setIsDeleteDialogOpen(false);
@@ -401,14 +404,14 @@ export default function Home() {
             `}</style>
             {words.length == 0 ? (
               <div className="h-full w-full p-4 flex justify-center items-center">
-                <p className="text-2xl text-gray-400 font-openSans">
+                <p className="text-2xl dark:text-gray-400 text-gray-500 font-openSans">
                   The void is empty... for now. Add some words to bring it to
                   life! ✨
                 </p>
               </div>
-            ) : noResults ? (
+            ) : noResults && displayedWords.length === 0 ? (
               <div className="h-full w-full p-4 flex justify-center items-center">
-                <p className="text-2xl text-gray-400 font-openSans">
+                <p className="text-2xl dark:text-gray-400 text-gray-500 font-openSans">
                   Oops! That tag must be hiding. Try a different one! 😅
                 </p>
               </div>
@@ -423,11 +426,11 @@ export default function Home() {
                 >
                   <div
                     onClick={() => toggleDefinition(index)}
-                    className="max-w-md border-2 rounded-lg border-gray-400 p-1  h-[65%] flex flex-col items-center justify-center w-full space-y-4 text-center"
+                    className="max-w-md border-2 rounded-lg border-borderColor p-1  h-[65%] flex flex-col items-center justify-center w-full space-y-4 text-center"
                   >
                     {visibleDefinitions[index] ? (
                       <div className="flex flex-col w-full">
-                        <p className="text-xl text-gray-300 font-opensans">
+                        <p className="text-xl dark:text-gray-300 text-gray-500 font-opensans">
                           {item.definition}
                         </p>
                         <div className="flex justify-center items-center">
@@ -435,7 +438,7 @@ export default function Home() {
                             <Badge
                               key={num}
                               variant="outline"
-                              className="text-white m-2 font-openSans"
+                              className="dark:text-white border border-borderColor m-2 font-openSans"
                             >
                               {tags}
                             </Badge>
@@ -454,52 +457,55 @@ export default function Home() {
           </div>
         </div>
       </main>
-      <div className="fixed top-0 left-0 right-0 border-b border-white/10 bg-[#121212]/80 backdrop-blur-sm">
+      <div className="fixed top-0 left-0 right-0 border-b border-gray-400 dark:border-white/10 dark:bg-backgroundDark/80 backdrop-blur-sm">
         <div className="flex justify-between items-center p-4 mx-auto">
           <p className="font-poppins font-semibold text-2xl">Flash</p>
+          <ThemeToggle />
         </div>
       </div>
-      <div className="fixed bottom-0 left-0 right-0 border-t border-white/10 bg-[#121212]/80 backdrop-blur-sm">
+      <div className="fixed bottom-0 left-0 right-0 border-t border-gray-400 dark:border-white/10 dark:bg-backgroundDark/80 backdrop-blur-sm">
         <div className="flex justify-between items-center p-2 mx-auto ">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-12 w-12 flex flex-col justify-center items-center"
-          >
-            <HomeIcon className="!h-6 !w-6 -mb-2" />
-            <p className="font-openSans">Home</p>
-          </Button>
+          <Link href="/">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-12 w-12 flex flex-col justify-center items-center hover:bg-transparent"
+            >
+              <HomeIcon className="!h-6 !w-6 -mb-2" />
+              <p className="font-openSans">Home</p>
+            </Button>
+          </Link>
 
           <Drawer open={isAddDrawerOpen} onOpenChange={setIsAddDrawerOpen}>
             <DrawerTrigger asChild>
               <Button
                 size="icon"
-                className="h-12 w-12 rounded-full bg-neutral-900"
+                className="h-12 w-12 rounded-full dark:bg-neutral-900 dark:text-white hover:bg-transparent bg-gray-200 text-black"
               >
                 <Plus className="!h-6 !w-6" />
               </Button>
             </DrawerTrigger>
             <DrawerTitle className="hidden"></DrawerTitle>
-            <DrawerContent className="bg-zinc-950 text-white h-full">
+            <DrawerContent className="dark:bg-backgroundDark dark:text-white h-full">
               <div className="mx-auto w-full max-w-sm p-6">
                 <div className="space-y-4">
                   <Input
                     placeholder="Enter word"
                     value={newWord}
                     onChange={(e) => setNewWord(e.target.value)}
-                    className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-400 font-opensans"
+                    className="dark:bg-zinc-900 border-borderColor dark:text-white placeholder:text-zinc-400 font-opensans"
                   />
                   <Textarea
                     placeholder="Enter definition"
                     value={newDefinition}
                     onChange={(e) => setNewDefinition(e.target.value)}
-                    className="h-28 bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-400 font-opensans"
+                    className="h-28 dark:bg-zinc-900 border-borderColor dark:text-white placeholder:text-zinc-400 font-opensans"
                   />
                   <Input
                     placeholder="Enter tags. (separated by comma)"
                     value={tagValue}
                     onChange={handleTagsChange}
-                    className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-400 font-opensans"
+                    className="dark:bg-zinc-900 border-borderColor dark:text-white placeholder:text-zinc-400 font-opensans"
                   />
                 </div>
                 <div className="pt-6 pb-4 space-y-4">
@@ -507,14 +513,14 @@ export default function Home() {
                     onClick={() => {
                       addWord();
                     }}
-                    className="w-full bg-white text-black hover:bg-white/90 font-poppins"
+                    className="w-full dark:bg-white dark:text-black hover:bg-white/90 font-poppins"
                   >
                     Add Word
                   </Button>
                   <DrawerClose asChild>
                     <Button
                       variant="ghost"
-                      className="w-full border border-white/10 font-poppins"
+                      className="w-full border border-borderColor font-poppins"
                     >
                       Cancel
                     </Button>
@@ -523,14 +529,16 @@ export default function Home() {
               </div>
             </DrawerContent>
           </Drawer>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-12 w-12 flex flex-col justify-center items-center"
-          >
-            <Settings className="!h-6 !w-6 -mb-2" />
-            <p className="font-openSans">Settings</p>
-          </Button>
+          <Link href="/settings">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-12 w-12 flex flex-col justify-center items-center hover:bg-transparent"
+            >
+              <Settings className="!h-6 !w-6 -mb-2" />
+              <p className="font-openSans">Settings</p>
+            </Button>
+          </Link>
 
           {/* <NotificationComponent words={words} /> */}
         </div>
