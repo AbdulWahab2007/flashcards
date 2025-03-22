@@ -1,24 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import {
-  Check,
-  FilterIcon,
-  HomeIcon,
-  Plus,
-  SearchX,
-  Settings,
-  SortDesc,
-  Trash2,
-} from "lucide-react";
+import { Check, FilterIcon, SearchX, SortDesc, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   DropdownMenu,
@@ -26,9 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-// import NotificationComponent from "@/components/ui/notificationComponent";
 import {
   Dialog,
   DialogContent,
@@ -38,8 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import ThemeToggle from "@/components/ui/themeToggle";
-import Link from "next/link";
+import { useWords } from "@/app/context/globalContext";
 interface WordItem {
   word: string;
   definition: string;
@@ -49,15 +30,10 @@ interface WordItem {
 
 export default function Home() {
   const [renderType, setRenderType] = useState("dateAsc");
-  const [words, setWords] = useState<WordItem[]>([]);
-  const [displayedWords, setDisplayedWords] = useState<WordItem[]>(words);
+  const { words, setWords, displayedWords, setDisplayedWords } = useWords();
   const [visibleDefinitions, setVisibleDefinitions] = useState<{
     [key: number]: boolean;
   }>({});
-  const [newWord, setNewWord] = useState("");
-  const [newDefinition, setNewDefinition] = useState("");
-  const [newTags, setNewTags] = useState<string[]>([]);
-  const [tagValue, setTagValue] = useState<string>("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -67,7 +43,6 @@ export default function Home() {
   );
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -127,43 +102,13 @@ export default function Home() {
         });
       }
     }
-  }, []);
+  }, [[setWords, setDisplayedWords]]);
 
   const toggleDefinition = (index: number) => {
     setVisibleDefinitions((prev) => ({
       ...prev,
       [index]: !prev[index],
     }));
-  };
-  const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTagValue(e.target.value);
-    const tags = e.target.value
-      .split(",")
-      .map((tag: string) => tag.trim())
-      .filter((tag: string) => tag !== "");
-    setNewTags(tags);
-  };
-  const addWord = () => {
-    if (newWord && newDefinition && newTags) {
-      const updatedWords = [
-        ...words,
-        {
-          word: newWord,
-          definition: newDefinition,
-          tags: newTags,
-          index: words.length,
-        },
-      ];
-      setWords(updatedWords);
-      setDisplayedWords(updatedWords);
-      localStorage.setItem("words", JSON.stringify(updatedWords));
-      setNewWord("");
-      setNewDefinition("");
-      setNewTags([]);
-      setTagValue("");
-      toast.success("Another word enters the Hall of Knowledge! 🏛️");
-      setIsAddDrawerOpen(false);
-    }
   };
   const deleteWord = (index: number) => {
     if (words.length === 0) {
@@ -217,7 +162,7 @@ export default function Home() {
         ? [...words].reverse()
         : words
     );
-  }, [renderType, words]);
+  }, [renderType, words, setDisplayedWords]);
   return (
     <div className="flex flex-col min-h-screen dark:bg-backgroundDark dark:text-white">
       <main className="flex-1 relative">
@@ -248,7 +193,7 @@ export default function Home() {
                       value={searchQuery}
                       placeholder="Search with tags (e.g., tech, science)"
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="dark:bg-backgroundDark border-borderColor text-white placeholder:text-gray-400 font-opensans pr-10"
+                      className="dark:bg-backgroundDark border-borderColor placeholder:text-borderColor font-opensans pr-10"
                     />
                   </div>
                   <div className="flex -ml-2 w-full flex-wrap">
@@ -295,7 +240,7 @@ export default function Home() {
                     <SortDesc className="!h-6 !w-6" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 dark:text-white dark:bg-backgroundDark dark:border-white/10 border border-borderColor -mt-12 mr-12">
+                <DropdownMenuContent className="w-64 dark:text-white dark:bg-backgroundDark dark:border-white/10 border border-borderColor -mt-12 mr-12">
                   <DropdownMenuItem
                     onSelect={() => setRenderType("dateAsc")}
                     className="flex items-center justify-between px-2 py-1"
@@ -326,7 +271,7 @@ export default function Home() {
                   className="h-12 w-12"
                   onClick={() => {
                     handleSearchReset();
-                    setSearchQuery(""); // Clear search query
+                    setSearchQuery("");
                   }}
                 >
                   <SearchX className="!h-6 !w-6" />
@@ -404,14 +349,14 @@ export default function Home() {
             `}</style>
             {words.length == 0 ? (
               <div className="h-full w-full p-4 flex justify-center items-center">
-                <p className="text-2xl dark:text-gray-400 text-gray-500 font-openSans">
+                <p className="text-2xl dark:text-borderColor text-gray-500 font-openSans">
                   The void is empty... for now. Add some words to bring it to
                   life! ✨
                 </p>
               </div>
             ) : noResults && displayedWords.length === 0 ? (
               <div className="h-full w-full p-4 flex justify-center items-center">
-                <p className="text-2xl dark:text-gray-400 text-gray-500 font-openSans">
+                <p className="text-2xl dark:text-borderColor text-gray-500 font-openSans">
                   Oops! That tag must be hiding. Try a different one! 😅
                 </p>
               </div>
@@ -457,90 +402,9 @@ export default function Home() {
           </div>
         </div>
       </main>
-      <div className="fixed top-0 left-0 right-0 border-b border-gray-400 dark:border-white/10 dark:bg-backgroundDark/80 backdrop-blur-sm">
+      <div className="fixed top-0 left-0 right-0 border-b border-borderColor dark:border-white/10 dark:bg-backgroundDark/80 backdrop-blur-sm">
         <div className="flex justify-between items-center p-4 mx-auto">
           <p className="font-poppins font-semibold text-2xl">Flash</p>
-          <ThemeToggle />
-        </div>
-      </div>
-      <div className="fixed bottom-0 left-0 right-0 border-t border-gray-400 dark:border-white/10 dark:bg-backgroundDark/80 backdrop-blur-sm">
-        <div className="flex justify-between items-center p-2 mx-auto ">
-          <Link href="/">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-12 w-12 flex flex-col justify-center items-center hover:bg-transparent"
-            >
-              <HomeIcon className="!h-6 !w-6 -mb-2" />
-              <p className="font-openSans">Home</p>
-            </Button>
-          </Link>
-
-          <Drawer open={isAddDrawerOpen} onOpenChange={setIsAddDrawerOpen}>
-            <DrawerTrigger asChild>
-              <Button
-                size="icon"
-                className="h-12 w-12 rounded-full dark:bg-neutral-900 dark:text-white hover:bg-transparent bg-gray-200 text-black"
-              >
-                <Plus className="!h-6 !w-6" />
-              </Button>
-            </DrawerTrigger>
-            <DrawerTitle className="hidden"></DrawerTitle>
-            <DrawerContent className="dark:bg-backgroundDark dark:text-white h-full">
-              <div className="mx-auto w-full max-w-sm p-6">
-                <div className="space-y-4">
-                  <Input
-                    placeholder="Enter word"
-                    value={newWord}
-                    onChange={(e) => setNewWord(e.target.value)}
-                    className="dark:bg-zinc-900 border-borderColor dark:text-white placeholder:text-zinc-400 font-opensans"
-                  />
-                  <Textarea
-                    placeholder="Enter definition"
-                    value={newDefinition}
-                    onChange={(e) => setNewDefinition(e.target.value)}
-                    className="h-28 dark:bg-zinc-900 border-borderColor dark:text-white placeholder:text-zinc-400 font-opensans"
-                  />
-                  <Input
-                    placeholder="Enter tags. (separated by comma)"
-                    value={tagValue}
-                    onChange={handleTagsChange}
-                    className="dark:bg-zinc-900 border-borderColor dark:text-white placeholder:text-zinc-400 font-opensans"
-                  />
-                </div>
-                <div className="pt-6 pb-4 space-y-4">
-                  <Button
-                    onClick={() => {
-                      addWord();
-                    }}
-                    className="w-full dark:bg-white dark:text-black hover:bg-white/90 font-poppins"
-                  >
-                    Add Word
-                  </Button>
-                  <DrawerClose asChild>
-                    <Button
-                      variant="ghost"
-                      className="w-full border border-borderColor font-poppins"
-                    >
-                      Cancel
-                    </Button>
-                  </DrawerClose>
-                </div>
-              </div>
-            </DrawerContent>
-          </Drawer>
-          <Link href="/settings">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-12 w-12 flex flex-col justify-center items-center hover:bg-transparent"
-            >
-              <Settings className="!h-6 !w-6 -mb-2" />
-              <p className="font-openSans">Settings</p>
-            </Button>
-          </Link>
-
-          {/* <NotificationComponent words={words} /> */}
         </div>
       </div>
     </div>

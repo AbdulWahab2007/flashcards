@@ -5,7 +5,8 @@ import { Red_Hat_Display } from "next/font/google";
 import { Open_Sans } from "next/font/google";
 import { Poppins } from "next/font/google";
 import { Toaster } from "sonner";
-
+import BottomMenu from "@/components/ui/bottomMenu";
+import { WordsProvider } from "./context/globalContext";
 export const metadata: Metadata = {
   title: "Flash",
   description: "A flashcard app for your ease.",
@@ -49,16 +50,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${redHatDisplay.variable}  ${poppins.variable}  ${openSans.variable}`}
-    >
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+    <WordsProvider>
+      <html
+        lang="en"
+        className={`${redHatDisplay.variable}  ${poppins.variable}  ${openSans.variable}`}
       >
-        {children}
-        <Toaster position="bottom-center" richColors />
-      </body>
-    </html>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          {children}
+          <BottomMenu />
+          <Toaster position="bottom-center" richColors />
+        </body>
+      </html>
+    </WordsProvider>
   );
 }
