@@ -102,7 +102,7 @@ export default function Home() {
         });
       }
     }
-  }, [[setWords, setDisplayedWords]]);
+  }, [setWords, setDisplayedWords]);
 
   const toggleDefinition = (index: number) => {
     setVisibleDefinitions((prev) => ({
