@@ -23,7 +23,6 @@ export default function page() {
             </Link>
           </Button>
           <Button
-            disabled
             variant="outline"
             className="flex justify-between py-6 px-0 w-[93%] border-none dark:bg-backgroundDark"
           >

@@ -26,7 +26,7 @@ export default function ThemeToggle() {
       <Button
         onClick={lightMode}
         variant="outline"
-        className="flex justify-between py-6 px-0 w-[93%] border-none dark:bg-backgroundDark"
+        className="flex justify-between py-6 px-0 w-[93%] border-none dark:bg-backgroundDark shadow-none"
       >
         <div className="flex w-full justify-between items-center">
           <div className="flex items-center py-4">
@@ -39,7 +39,7 @@ export default function ThemeToggle() {
       <Button
         onClick={darkMode}
         variant="outline"
-        className="flex justify-between py-6 px-0 w-[93%] border-none dark:bg-backgroundDark"
+        className="flex justify-between py-6 px-0 w-[93%] border-none dark:bg-backgroundDark shadow-none"
       >
         <div className="flex w-full justify-between items-center dark:border-gray-600 border-borderColor border-t border-x-0">
           <div className="flex items-center py-4">
@@ -52,7 +52,7 @@ export default function ThemeToggle() {
       <Button
         onClick={systemMode}
         variant="outline"
-        className="flex justify-between py-6 px-0 w-[93%] border-none dark:bg-backgroundDark border-b-0"
+        className="flex justify-between py-6 px-0 w-[93%] border-none dark:bg-backgroundDark border-b-0 shadow-none"
       >
         <div className="flex w-full justify-between items-center dark:border-gray-600 border-borderColor border-t border-x-0">
           <div className="flex items-center py-4">
