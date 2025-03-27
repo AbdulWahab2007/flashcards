@@ -7,7 +7,7 @@ interface Word {
   word: string;
   definition: string;
   tags: string[];
-  index: number;
+  id: number;
 }
 
 interface WordsContextType {
@@ -78,14 +78,14 @@ export function WordsProvider({ children }: { children: React.ReactNode }) {
     newDefinition: string,
     newTags: string[]
   ) => {
-    if (newWord && newDefinition && newTags.length > 0) {
+    if (newWord && newDefinition) {
       const updatedWords = [
         ...words,
         {
           word: newWord,
           definition: newDefinition,
-          tags: newTags,
-          index: words.length,
+          tags: newTags || [],
+          id: Math.random(),
         },
       ];
       setWords(updatedWords);
@@ -100,7 +100,8 @@ export function WordsProvider({ children }: { children: React.ReactNode }) {
       toast.error("No words to export! 📭");
       return;
     }
-    const dataStr = JSON.stringify(words, null, 2);
+    const importedWords = words.map(({ id, ...rest }) => rest);
+    const dataStr = JSON.stringify(importedWords, null, 2);
     const blob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -120,17 +121,19 @@ export function WordsProvider({ children }: { children: React.ReactNode }) {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const importedWords: Word[] = JSON.parse(e.target?.result as string);
-        const updatedWords = [...words]; // Changed `let` to `const`
+        const importedWords: any[] = JSON.parse(e.target?.result as string);
+        const updatedWords = [...words];
 
         importedWords.forEach((importedWord) => {
+          const { word, definition, tags = [] } = importedWord; // Ignore any `id` or `index`
           const existingWordIndex = updatedWords.findIndex(
-            (w) => w.word === importedWord.word
+            (w) => w.word === word
           );
+
           if (existingWordIndex !== -1) {
             const existingWord = updatedWords[existingWordIndex];
             const mergedTags = Array.from(
-              new Set([...existingWord.tags, ...importedWord.tags])
+              new Set([...existingWord.tags, ...tags])
             );
 
             updatedWords[existingWordIndex] = {
@@ -139,8 +142,10 @@ export function WordsProvider({ children }: { children: React.ReactNode }) {
             };
           } else {
             updatedWords.push({
-              ...importedWord,
-              index: updatedWords.length,
+              word,
+              definition,
+              tags: tags || [],
+              id: Math.random(), // Assign a fresh unique ID
             });
           }
         });
@@ -149,9 +154,9 @@ export function WordsProvider({ children }: { children: React.ReactNode }) {
         setDisplayedWords(updatedWords);
         localStorage.setItem("words", JSON.stringify(updatedWords));
 
-        toast.success("Words imported successfully! 📥");
+        toast.success("Words imported successfully with new IDs! 📥");
       } catch {
-        toast.error("Invalid JSON file format! ❌"); // Removed unused `error` variable
+        toast.error("Invalid JSON file format! ❌");
       }
     };
 

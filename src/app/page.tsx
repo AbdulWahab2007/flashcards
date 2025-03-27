@@ -25,7 +25,7 @@ interface WordItem {
   word: string;
   definition: string;
   tags: Array<string>;
-  index: number;
+  id: number;
 }
 
 export default function Home() {
@@ -80,6 +80,7 @@ export default function Home() {
           word: word.word,
           definition: word.definition,
           tags: word.tags,
+          id: word.id,
           index,
         })
       );
@@ -110,18 +111,18 @@ export default function Home() {
       [index]: !prev[index],
     }));
   };
-  const deleteWord = (index: number) => {
+  const deleteWord = (id: number) => {
     if (words.length === 0) {
       toast.error("There's nothing to delete! 🚫");
       setIsDeleteDialogOpen(false);
       return;
     }
-    const updatedWords = words
-      .filter((_, i) => i !== index)
-      .map((word, i) => ({ ...word, index: i }));
+
+    const updatedWords = words.filter((word) => word.id !== id);
     setWords(updatedWords);
     setDisplayedWords(updatedWords);
     localStorage.setItem("words", JSON.stringify(updatedWords));
+
     toast.error("Poof! That word just vanished into the void. 🚀");
     setIsDeleteDialogOpen(false);
   };
@@ -324,7 +325,7 @@ export default function Home() {
                         className="font-poppins"
                         variant="destructive"
                         onClick={() => {
-                          deleteWord(currentIndex);
+                          deleteWord(displayedWords[currentIndex]?.id);
                         }}
                       >
                         Delete

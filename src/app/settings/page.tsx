@@ -10,7 +10,7 @@ export default function page() {
           <Button
             disabled
             variant="outline"
-            className="flex justify-between py-6 px-0 w-[93%] border-none dark:bg-backgroundDark"
+            className="flex justify-between py-6 px-0 w-[93%] border-none dark:bg-backgroundDark  shadow-none"
           >
             <Link href="/settings/notifications" className="w-full">
               <div className="flex w-full justify-between items-center">
@@ -24,7 +24,7 @@ export default function page() {
           </Button>
           <Button
             variant="outline"
-            className="flex justify-between py-6 px-0 w-[93%] border-none dark:bg-backgroundDark"
+            className="flex justify-between py-6 px-0 w-[93%] border-none dark:bg-backgroundDark  shadow-none"
           >
             <Link href="/settings/import-export" className="w-full">
               <div className="flex w-full justify-between items-center dark:border-gray-600 border-borderColor border-t border-x-0">
@@ -38,7 +38,7 @@ export default function page() {
           </Button>
           <Button
             variant="outline"
-            className="flex justify-between py-6 px-0 w-[93%] border-none dark:bg-backgroundDark"
+            className="flex justify-between py-6 px-0 w-[93%] border-none dark:bg-backgroundDark  shadow-none"
           >
             <Link href="/settings/theme" className="w-full">
               <div className="flex w-full justify-between items-center dark:border-gray-600 border-borderColor border-t border-x-0">
