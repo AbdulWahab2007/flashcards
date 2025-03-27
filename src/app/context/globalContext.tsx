@@ -100,7 +100,11 @@ export function WordsProvider({ children }: { children: React.ReactNode }) {
       toast.error("No words to export! 📭");
       return;
     }
-    const importedWords = words.map(({ id, ...rest }) => rest);
+    const importedWords = words.map((word) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { id, ...rest } = word;
+      return rest;
+    });
     const dataStr = JSON.stringify(importedWords, null, 2);
     const blob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -121,11 +125,11 @@ export function WordsProvider({ children }: { children: React.ReactNode }) {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const importedWords: any[] = JSON.parse(e.target?.result as string);
+        const importedWords: Word[] = JSON.parse(e.target?.result as string);
         const updatedWords = [...words];
 
         importedWords.forEach((importedWord) => {
-          const { word, definition, tags = [] } = importedWord; // Ignore any `id` or `index`
+          const { word, definition, tags = [] } = importedWord;
           const existingWordIndex = updatedWords.findIndex(
             (w) => w.word === word
           );
@@ -145,7 +149,7 @@ export function WordsProvider({ children }: { children: React.ReactNode }) {
               word,
               definition,
               tags: tags || [],
-              id: Math.random(), // Assign a fresh unique ID
+              id: Math.random(),
             });
           }
         });
