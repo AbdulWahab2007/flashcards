@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react"; // Import useState
-import useNotifications from "../../hooks/useNotifications";
+import { useEffect, useState } from "react"; // Import useState
 
 interface NotificationComponentProps {
   words: {
@@ -17,8 +16,10 @@ export default function NotificationComponent({
 }: NotificationComponentProps) {
   const [localPermission, setLocalPermission] =
     useState<NotificationPermission>("default"); // Default permission
-  const { showNotification } = useNotifications();
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  // const { showNotification } = useNotifications();
+  // const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  console.log(words)
 
   useEffect(() => {
     if (typeof window !== "undefined") {
