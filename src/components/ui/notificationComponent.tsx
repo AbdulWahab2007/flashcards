@@ -4,7 +4,12 @@ import { useEffect, useRef, useState } from "react"; // Import useState
 import useNotifications from "../../hooks/useNotifications";
 
 interface NotificationComponentProps {
-  words: { word: string; index: number }[];
+  words: {
+    word: string;
+    definition: string;
+    tags: Array<string>;
+    id: number;
+  }[];
 }
 
 export default function NotificationComponent({
@@ -30,11 +35,9 @@ export default function NotificationComponent({
         intervalRef.current = setInterval(() => {
           const randomIndex = Math.floor(Math.random() * words.length);
           const randomWord = words[randomIndex].word;
-          const wordIndex = words[randomIndex].index;
 
           showNotification("Flashcard Reminder", {
             body: `Don't forget to review: ${randomWord}`,
-            data: { wordIndex },
           });
         }, 10000);
       }

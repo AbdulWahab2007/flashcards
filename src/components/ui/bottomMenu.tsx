@@ -115,8 +115,6 @@ export default function BottomMenu() {
             <p className="font-openSans">Settings</p>
           </Button>
         </Link>
-
-        {/* <NotificationComponent words={words} /> */}
       </div>
     </div>
   );
