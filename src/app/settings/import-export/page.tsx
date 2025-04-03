@@ -7,24 +7,24 @@ export default function Page() {
   const { exportWords, importWords } = useWords();
 
   return (
-    <div className="flex flex-col min-h-screen dark:bg-backgroundDark dark:text-white">
+    <div className="flex flex-col min-h-screen dark:bg-backgroundDark dark:text-white bg-purple-100">
       <div className="w-full flex justify-center my-4">
         <div className="flex-col flex justify-center items-center rounded-xl w-[95%]">
           <Button
             onClick={exportWords}
             variant="outline"
-            className="flex justify-between py-6 px-0 w-[93%] border-none dark:bg-backgroundDark shadow-none"
+            className="flex justify-between py-6 px-0 w-[93%] border-none bg-purple-100 dark:bg-backgroundDark shadow-none"
           >
             <div className="flex w-full justify-between items-center">
               <div className="flex items-center py-4">
-                <p className="font-poppins mx-2">Export</p>
+                <p className="font-poppins mx-2 text-purple-800">Export</p>
               </div>
-              <Upload className="!h-6 !w-6" />
+              <Upload className="!h-6 !w-6 text-purple-700" />
             </div>
           </Button>
           <Button
             variant="outline"
-            className="flex justify-between py-6 px-0 w-[93%] border-none dark:bg-backgroundDark shadow-none"
+            className="flex justify-between py-6 px-0 w-[93%] border-none bg-purple-100 dark:bg-backgroundDark shadow-none"
           >
             <input
               type="file"
@@ -32,11 +32,11 @@ export default function Page() {
               className="absolute w-[90%] bg-red-500 py-3 opacity-0"
               onChange={importWords}
             />
-            <div className="flex w-full justify-between items-center dark:border-gray-600 border-borderColor border-t border-x-0">
+            <div className="flex w-full justify-between items-center dark:border-gray-600 border-purple-300 border-t border-x-0">
               <div className="flex items-center py-4">
-                <p className="font-poppins mx-2">Import</p>
+                <p className="font-poppins mx-2 text-purple-800">Import</p>
               </div>
-              <Download className="!h-6 !w-6" />
+              <Download className="!h-6 !w-6 text-purple-700" />
             </div>
           </Button>
         </div>
