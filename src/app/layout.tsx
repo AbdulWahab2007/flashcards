@@ -7,6 +7,7 @@ import { Poppins } from "next/font/google";
 import { Toaster } from "sonner";
 import BottomMenu from "@/components/ui/bottomMenu";
 import { WordsProvider } from "./context/globalContext";
+import ServiceWorker from "@/components/ServiceWorker";
 export const metadata: Metadata = {
   title: "Flash",
   description: "A flashcard app for your ease.",
@@ -58,6 +59,7 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
+        <ServiceWorker />
           {children}
           <BottomMenu />
           <Toaster position="bottom-center" richColors />

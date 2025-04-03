@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react"; // Import useState
-import useNotifications from "../../hooks/useNotifications";
+import { useEffect, useState } from "react"; // Import useState
 
 interface NotificationComponentProps {
   words: {
@@ -17,8 +16,10 @@ export default function NotificationComponent({
 }: NotificationComponentProps) {
   const [localPermission, setLocalPermission] =
     useState<NotificationPermission>("default"); // Default permission
-  const { showNotification } = useNotifications();
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  // const { showNotification } = useNotifications();
+  // const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  console.log(words)
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -29,32 +30,32 @@ export default function NotificationComponent({
     }
   }, []);
 
-  useEffect(() => {
-    if (localPermission === "granted" && words.length > 0) {
-      if (!intervalRef.current) {
-        intervalRef.current = setInterval(() => {
-          const randomIndex = Math.floor(Math.random() * words.length);
-          const randomWord = words[randomIndex].word;
-
-          showNotification("Flashcard Reminder", {
-            body: `Don't forget to review: ${randomWord}`,
-          });
-        }, 10000);
-      }
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [localPermission, showNotification, words]); // Use localPermission
+  // useEffect(() => {
+  //   if (localPermission === "granted" && words.length > 0) {
+  //     if (!intervalRef.current) {
+  //       intervalRef.current = setInterval(() => {
+  //         const randomIndex = Math.floor(Math.random() * words.length);
+  //         const randomWord = words[randomIndex].word;
+  //
+  //         showNotification("Flashcard Reminder", {
+  //           body: `Don't forget to review: ${randomWord}`,
+  //         });
+  //       }, 10000);
+  //     }
+  //   } else {
+  //     if (intervalRef.current) {
+  //       clearInterval(intervalRef.current);
+  //       intervalRef.current = null;
+  //     }
+  //   }
+  //
+  //   return () => {
+  //     if (intervalRef.current) {
+  //       clearInterval(intervalRef.current);
+  //       intervalRef.current = null;
+  //     }
+  //   };
+  // }, [localPermission, showNotification, words]); // Use localPermission
 
   return (
     <div>
