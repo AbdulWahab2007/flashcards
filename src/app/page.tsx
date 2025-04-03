@@ -407,7 +407,7 @@ export default function Home() {
       <div className="fixed top-0 left-0 right-0 border-b border-borderColor dark:border-white/10 dark:bg-backgroundDark/80 backdrop-blur-sm">
         <div className="flex justify-between items-center p-4 mx-auto">
           <p className="font-poppins font-semibold text-2xl">Flash</p>
-          <NotificationComponent words={words} />
+          <NotificationComponent />
         </div>
       </div>
     </div>
