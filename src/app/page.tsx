@@ -21,6 +21,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useWords } from "@/app/context/globalContext";
+import NotificationComponent from "@/components/ui/notificationComponent";
 interface WordItem {
   word: string;
   definition: string;
@@ -165,7 +166,7 @@ export default function Home() {
     );
   }, [renderType, words, setDisplayedWords]);
   return (
-    <div className="flex flex-col min-h-screen dark:bg-backgroundDark dark:text-white bg-purple-100">
+    <div className="flex flex-col min-h-screen dark:bg-backgroundDark dark:text-white">
       <main className="flex-1 relative">
         <div className="w-screen h-screen flex items-center justify-center ">
           <div className="w-[13%] h-[69%]  absolute flex flex-col justify-between right-0">
@@ -180,12 +181,12 @@ export default function Home() {
                     size="icon"
                     className="w-12 h-12 bg-transparent hover:bg-transparent"
                   >
-                    <FilterIcon className="!h-6 !w-6 text-purple-500" />
+                    <FilterIcon className="!h-6 !w-6" />
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px] w-[90%] rounded-lg bg-purple-100 dark:bg-backgroundDark dark:text-white flex flex-col justify-start items-start">
+                <DialogContent className="sm:max-w-[425px] w-[90%] rounded-lg dark:bg-backgroundDark dark:text-white flex flex-col justify-start items-start">
                   <DialogHeader>
-                    <DialogTitle className="font-poppins text-purple-600">
+                    <DialogTitle className="font-poppins">
                       Filter by tags
                     </DialogTitle>
                   </DialogHeader>
@@ -194,14 +195,14 @@ export default function Home() {
                       value={searchQuery}
                       placeholder="Search with tags (e.g., tech, science)"
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="dark:bg-backgroundDark border-purple-300 shadow-none placeholder:text-borderColor font-opensans pr-10"
+                      className="dark:bg-backgroundDark border-borderColor placeholder:text-borderColor font-opensans pr-10"
                     />
                   </div>
-                  <div className="flex -ml-1 w-full flex-wrap">
+                  <div className="flex -ml-2 w-full flex-wrap">
                     {uniqueTags.map((tag, index) => (
                       <Badge
                         key={index}
-                        className="m-1 px-3 dark:text-white border-2 border-purple-700 font-openSans rounded-lg cursor-pointer"
+                        className="mx-2 my-1 px-3 dark:text-white border border-borderColor font-openSans rounded-lg cursor-pointer"
                         variant="outline"
                         onClick={() =>
                           setSearchQuery((prev) =>
@@ -219,7 +220,7 @@ export default function Home() {
                       <Button
                         type="submit"
                         variant="ghost"
-                        className="font-poppins border border-borderColor text-white bg-purple-800 dark:bg-backgroundDark dark:text-white"
+                        className="font-poppins border border-borderColor dark:bg-backgroundDark bg-gray-200 dark:text-white"
                         onClick={() => {
                           handleSearch();
                           setIsSearchDialogOpen(false);
@@ -238,36 +239,30 @@ export default function Home() {
                     size="icon"
                     className="w-12 h-12 bg-transparent hover:bg-transparent hover:text-white"
                   >
-                    <SortDesc className="!h-6 !w-6 text-purple-500" />
+                    <SortDesc className="!h-6 !w-6" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-64 dark:text-white dark:bg-backgroundDark dark:border-white/10 border border-purple-300 bg-purple-100 -mt-12 mr-12">
+                <DropdownMenuContent className="w-64 dark:text-white dark:bg-backgroundDark dark:border-white/10 border border-borderColor -mt-12 mr-12">
                   <DropdownMenuItem
                     onSelect={() => setRenderType("dateAsc")}
                     className="flex items-center justify-between px-2 py-1"
                   >
                     Date added (ascending)
-                    {renderType === "dateAsc" && (
-                      <Check className="w-4 h-4 text-purple-700" />
-                    )}
+                    {renderType === "dateAsc" && <Check className="w-4 h-4" />}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={() => setRenderType("dateDes")}
-                    className="flex items-center justify-between px-2 py-1 border-t border-b border-purple-300 dark:border-white/10"
+                    className="flex items-center justify-between px-2 py-1 border-t border-b border-borderColor dark:border-white/10"
                   >
                     Date added (descending)
-                    {renderType === "dateDes" && (
-                      <Check className="w-4 h-4 text-purple-700" />
-                    )}
+                    {renderType === "dateDes" && <Check className="w-4 h-4" />}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={() => setRenderType("random")}
                     className="flex items-center justify-between px-2 py-1"
                   >
                     Random
-                    {renderType === "random" && (
-                      <Check className="w-4 h-4 text-purple-700" />
-                    )}
+                    {renderType === "random" && <Check className="w-4 h-4" />}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -281,13 +276,13 @@ export default function Home() {
                     setSearchQuery("");
                   }}
                 >
-                  <SearchX className="!h-6 !w-6 text-purple-500" />
+                  <SearchX className="!h-6 !w-6" />
                 </Button>
               )}
             </div>
             <div className="w-full  flex flex-col justify-center items-center p-2">
               <Button variant="ghost" size="icon" className="h-12 w-12">
-                <p className="font-openSans text-base text-purple-700">
+                <p className="font-openSans text-base">
                   {displayedWords.length === 0
                     ? "0 / 0"
                     : `${Math.min(currentIndex + 1, displayedWords.length)} / ${
@@ -302,10 +297,10 @@ export default function Home() {
               >
                 <DialogTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-12 w-12">
-                    <Trash2 className="!h-6 !w-6 text-purple-500" />
+                    <Trash2 className="!h-6 !w-6" />
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px] w-[90%] rounded-lg border border-borderColor bg-purple-100 dark:bg-backgroundDark dark:text-white flex flex-col justify-start items-start">
+                <DialogContent className="sm:max-w-[425px] w-[90%] rounded-lg border border-borderColor dark:bg-backgroundDark dark:text-white flex flex-col justify-start items-start">
                   <DialogHeader className="w-full flex flex-col items-start">
                     <DialogTitle className="font-poppins">
                       Are you sure?
@@ -318,7 +313,7 @@ export default function Home() {
                     <div className="w-full flex justify-end">
                       <Button
                         type="submit"
-                        className="font-poppins border-purple-300 dark:bg-backgroundDark dark:text-white mx-2"
+                        className="font-poppins border-borderColor dark:bg-backgroundDark dark:text-white mx-2"
                         variant="outline"
                         onClick={() => {
                           setIsDeleteDialogOpen(false);
@@ -328,7 +323,7 @@ export default function Home() {
                       </Button>
                       <Button
                         type="submit"
-                        className="font-poppins bg-purple-800 hover:bg-purple-800"
+                        className="font-poppins"
                         variant="destructive"
                         onClick={() => {
                           deleteWord(displayedWords[currentIndex]?.id);
@@ -378,11 +373,11 @@ export default function Home() {
                 >
                   <div
                     onClick={() => toggleDefinition(index)}
-                    className="max-w-md shadow-lg rounded-xl bg-purple-200 p-1  h-[65%] flex flex-col items-center justify-center w-full space-y-4 text-center"
+                    className="max-w-md border-2 rounded-lg border-borderColor p-1  h-[65%] flex flex-col items-center justify-center w-full space-y-4 text-center"
                   >
                     {visibleDefinitions[index] ? (
                       <div className="flex flex-col w-full">
-                        <p className="text-xl dark:text-gray-300 text-gray-600 font-opensans">
+                        <p className="text-xl dark:text-gray-300 text-gray-500 font-opensans">
                           {item.definition}
                         </p>
                         <div className="flex justify-center items-center">
@@ -390,7 +385,7 @@ export default function Home() {
                             <Badge
                               key={num}
                               variant="outline"
-                              className="dark:text-white border-2 border-purple-700 m-1 font-openSans"
+                              className="dark:text-white border border-borderColor m-2 font-openSans"
                             >
                               {tags}
                             </Badge>
@@ -398,7 +393,7 @@ export default function Home() {
                         </div>
                       </div>
                     ) : (
-                      <h1 className="text-4xl font-bold font-poppins text-gray-800">
+                      <h1 className="text-4xl font-bold font-poppins">
                         {item.word}
                       </h1>
                     )}
@@ -409,11 +404,10 @@ export default function Home() {
           </div>
         </div>
       </main>
-      <div className="fixed top-0 left-0 right-0 border-b border-purple-300 dark:border-white/10 dark:bg-backgroundDark/80 backdrop-blur-sm bg-purple-200">
+      <div className="fixed top-0 left-0 right-0 border-b border-borderColor dark:border-white/10 dark:bg-backgroundDark/80 backdrop-blur-sm">
         <div className="flex justify-between items-center p-4 mx-auto">
-          <p className="font-poppins font-semibold text-2xl text-purple-600">
-            Flash
-          </p>
+          <p className="font-poppins font-semibold text-2xl">Flash</p>
+          <NotificationComponent words={words} />
         </div>
       </div>
     </div>
