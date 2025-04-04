@@ -67,10 +67,16 @@ export default function Home() {
 
     return () => observer.disconnect();
   }, [displayedWords]);
-  const scrollToWord = (index: number) => {
-    if (cardRefs.current[index]) {
-      cardRefs.current[index]?.scrollIntoView({ behavior: "smooth" });
+  const scrollToWord = (wordId: number) => {
+    const index = words.findIndex((word) => word.id === wordId);
+    console.log(words.findIndex((word) => word.id === wordId));
+    console.log(wordId);
+
+    console.log("Wait " + index);
+    if (index !== -1 && cardRefs.current[index]) {
+      cardRefs.current[index].scrollIntoView({ behavior: "smooth" });
       setCurrentIndex(index);
+      console.log("Scrolled to " + index);
     }
   };
   useEffect(() => {
@@ -87,24 +93,20 @@ export default function Home() {
       );
       setWords(parsedWords);
       setDisplayedWords(parsedWords);
-
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.ready.then((registration) => {
-          registration.getNotifications().then((notifications) => {
-            if (notifications.length > 0) {
-              const notification = notifications[0];
-              const wordIndex = notification.data?.wordIndex;
-              notification.close();
-
-              if (wordIndex !== undefined) {
-                scrollToWord(wordIndex);
-              }
-            }
-          });
-        });
-      }
     }
   }, [setWords, setDisplayedWords]);
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        if (event.data && event.data.type === "NOTIFICATION_CLICK") {
+          if (event.data.wordId !== undefined) {
+            scrollToWord(event.data.wordId);
+            console.log("Will scroll to " + event.data.wordId);
+          }
+        }
+      });
+    }
+  }, [words]);
 
   const toggleDefinition = (index: number) => {
     setVisibleDefinitions((prev) => ({
@@ -407,6 +409,13 @@ export default function Home() {
       <div className="fixed top-0 left-0 right-0 border-b border-borderColor dark:border-white/10 dark:bg-backgroundDark/80 backdrop-blur-sm">
         <div className="flex justify-between items-center p-4 mx-auto">
           <p className="font-poppins font-semibold text-2xl">Flash</p>
+          <Button
+            onClick={() => {
+              scrollToWord(0.5617523854824872);
+            }}
+          >
+            Scroll
+          </Button>
           <NotificationComponent />
         </div>
       </div>

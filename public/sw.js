@@ -11,8 +11,9 @@ self.addEventListener("activate", (event) => {
 // Function to show notification
 function showNotification(randomWord) {
   self.registration.showNotification("Reminder!", {
-    body: `${randomWord}`,
+    body: `${randomWord.word}`,
     icon: "/icon.png",
+    data: { wordId: randomWord.id },
   });
 }
 
@@ -78,7 +79,7 @@ async function scheduleNotifications() {
     // console.log(randomWord);
 
     if (randomWord) {
-      showNotification(randomWord.word);
+      showNotification(randomWord);
     }
     saveLastNotification();
   }
@@ -87,3 +88,23 @@ async function scheduleNotifications() {
 }
 
 scheduleNotifications();
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const wordId = event.notification.data?.wordId;
+  event.waitUntil(
+    clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clientList) => {
+        if (clientList.length > 0) {
+          // Focus the first window and send a message with the wordId
+          const client = clientList[0];
+          client.focus();
+          client.postMessage({ type: "NOTIFICATION_CLICK", wordId });
+        } else {
+          // If no window is open, open one with a query parameter
+          clients.openWindow(`/?wordId=${wordId}`);
+        }
+      })
+  );
+});
