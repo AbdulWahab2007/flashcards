@@ -20,12 +20,15 @@ self.addEventListener("message", (event) => {
   if (event.data) {
     if (event.data.type === "SET_DATA") {
       words = event.data.data;
+      console.log(event.data.data);
     } else if (event.data.type === "START_NOTIFICATIONS") {
       scheduleNotifications();
     }
   }
 });
 function getRandomWord() {
+  console.log(words);
+
   if (words.length === 0) {
     return null;
   }
@@ -66,17 +69,22 @@ async function getLastNotification() {
 async function scheduleNotifications() {
   const lastNotification = await getLastNotification();
   const now = Date.now();
-  const interval = 40;
-  if (now - lastNotification > interval * 60 * 1000) {
+  const interval = 1;
+  const notitficationTime = interval * 60 * 1000;
+  if (now - lastNotification > 10000) {
     const randomWord = getRandomWord();
+    console.log("lol");
+    console.log(randomWord);
 
     if (randomWord) {
+      console.log("lol2");
+
       showNotification(randomWord);
     }
     saveLastNotification();
   }
 
-  setTimeout(scheduleNotifications, interval * 60 * 1000);
+  setTimeout(scheduleNotifications, 10000);
 }
 
 scheduleNotifications();
