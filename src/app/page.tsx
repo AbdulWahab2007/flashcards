@@ -54,6 +54,12 @@ export default function Home() {
             );
             if (index !== -1) {
               setCurrentIndex(index);
+              const currentWordId = displayedWords[index]?.id;
+              if (currentWordId) {
+                const url = new URL(window.location.href);
+                url.searchParams.set("wordId", String(currentWordId));
+                window.history.replaceState(null, "", url.toString());
+              }
             }
           }
         });
@@ -69,14 +75,10 @@ export default function Home() {
   }, [displayedWords]);
   const scrollToWord = (wordId: number) => {
     const index = words.findIndex((word) => word.id === wordId);
-    console.log(words.findIndex((word) => word.id === wordId));
-    console.log(wordId);
 
-    console.log("Wait " + index);
     if (index !== -1 && cardRefs.current[index]) {
       cardRefs.current[index].scrollIntoView({ behavior: "smooth" });
       setCurrentIndex(index);
-      console.log("Scrolled to " + index);
     }
   };
   useEffect(() => {
@@ -96,18 +98,10 @@ export default function Home() {
     }
   }, [setWords, setDisplayedWords]);
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.addEventListener("message", (event) => {
-        if (event.data && event.data.type === "NOTIFICATION_CLICK") {
-          if (event.data.wordId !== undefined) {
-            scrollToWord(event.data.wordId);
-            console.log("Will scroll to " + event.data.wordId);
-          }
-        }
-      });
-    }
+    const params = new URLSearchParams(window.location.search);
+    const wordIndexParam = params.get("wordId");
+    scrollToWord(Number(wordIndexParam));
   }, [words]);
-
   const toggleDefinition = (index: number) => {
     setVisibleDefinitions((prev) => ({
       ...prev,
@@ -409,13 +403,6 @@ export default function Home() {
       <div className="fixed top-0 left-0 right-0 border-b border-borderColor dark:border-white/10 dark:bg-backgroundDark/80 backdrop-blur-sm">
         <div className="flex justify-between items-center p-4 mx-auto">
           <p className="font-poppins font-semibold text-2xl">Flash</p>
-          <Button
-            onClick={() => {
-              scrollToWord(0.5617523854824872);
-            }}
-          >
-            Scroll
-          </Button>
           <NotificationComponent />
         </div>
       </div>
