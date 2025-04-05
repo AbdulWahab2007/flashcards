@@ -69,22 +69,17 @@ async function getLastNotification() {
 async function scheduleNotifications() {
   const lastNotification = await getLastNotification();
   const now = Date.now();
-  const interval = 1;
-  const notitficationTime = interval * 60 * 1000;
-  if (now - lastNotification > 10000) {
+  if (now - lastNotification > 40 * 60 * 1000) {
     const randomWord = getRandomWord();
-    console.log("lol");
     console.log(randomWord);
 
     if (randomWord) {
-      console.log("lol2");
-
       showNotification(randomWord);
     }
     saveLastNotification();
   }
 
-  setTimeout(scheduleNotifications, 10000);
+  setTimeout(scheduleNotifications, 40 * 60 * 1000);
 }
 
 scheduleNotifications();
